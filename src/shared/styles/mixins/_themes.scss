@@ -1,0 +1,21 @@
+@use '../tokens' as tk;
+
+@mixin generate-vars($token-map) {
+  @each $k, $v in $token-map {
+    --#{$k}: #{$v};
+  }
+}
+
+@mixin themes {
+  :root {
+    @include generate-vars(tk.$light-map);
+  }
+  [data-theme='dark'] {
+    @include generate-vars(tk.$dark-map);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      @include generate-vars(tk.$dark-map);
+    }
+  }
+}

@@ -1,0 +1,88 @@
+@use '../tokens' as *;
+@use 'sass:map';
+
+$styles: (
+    h1: (
+        fs: $font-size-h1,
+        lh: $line-height-h1,
+        fw: $font-weight-bold,
+    ),
+    sub1: (
+        fs: $font-size-h3,
+        lh: $line-height-h3,
+        fw: $font-weight-regular,
+    ),
+    h2: (
+        fs: $font-size-h2,
+        lh: $line-height-h2,
+        fw: $font-weight-bold,
+    ),
+    sub2: (
+        fs: $font-size-h4,
+        lh: $line-height-h4,
+        fw: $font-weight-regular,
+    ),
+    h3: (
+        fs: $font-size-h3,
+        lh: $line-height-h3,
+        fw: $font-weight-bold,
+    ),
+    sub3: (
+        fs: $font-size-h5,
+        lh: $line-height-h5,
+        fw: $font-weight-regular,
+    ),
+    h4: (
+        fs: $font-size-h4,
+        lh: $line-height-h4,
+        fw: $font-weight-bold,
+    ),
+    sub4: (
+        fs: $font-size-l,
+        lh: $line-height-l,
+        fw: $font-weight-regular,
+    ),
+    h5: (
+        fs: $font-size-h5,
+        lh: $line-height-h5,
+        fw: $font-weight-bold,
+    ),
+    lb: (
+        fs: $font-size-l,
+        lh: $line-height-l,
+        fw: $font-weight-bold,
+    ),
+    mb: (
+        fs: $font-size-m,
+        lh: $line-height-m,
+        fw: $font-weight-bold,
+    ),
+    m: (
+        fs: $font-size-m,
+        lh: $line-height-m,
+        fw: $font-weight-regular,
+    ),
+    sb: (
+        fs: $font-size-s,
+        lh: $line-height-s,
+        fw: $font-weight-bold,
+    ),
+    s: (
+        fs: $font-size-s,
+        lh: $line-height-s,
+        fw: $font-weight-regular,
+    ),
+    xs: (
+        fs: $font-size-xs,
+        lh: $line-height-xs,
+        fw: $font-weight-regular,
+    ),
+);
+
+@mixin text($style) {
+  $map: map.get($styles, $style);
+  font-family: $font-family-main;
+  font-size: map.get($map, fs);
+  line-height: map.get($map, lh);
+  font-weight: map.get($map, fw);
+}
