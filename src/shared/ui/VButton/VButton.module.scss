@@ -4,7 +4,7 @@
   @include text(m);
   display: flex;
   align-items: center;
-  justify-items: center;
+  justify-content: center;
   gap: 6px;
   height: 32px;
   width: fit-content;
@@ -58,6 +58,7 @@
       border-color: var(--border-button-active);
     }
     &:disabled {
+      border-color: transparent;
       color: var(--text-disable);
       cursor: not-allowed;
       stroke: var(--graphic-disable);
@@ -73,7 +74,9 @@
       border-color: var(--border-negative-secondary);
     }
     &:disabled {
+      border-color: transparent;
       stroke: var(--graphic-disable);
+      cursor: not-allowed;
       color: var(--text-disable);
     }
   }
