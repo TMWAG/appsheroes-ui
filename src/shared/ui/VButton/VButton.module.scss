@@ -8,48 +8,54 @@
   gap: 6px;
   height: 32px;
   width: fit-content;
-  padding: 0 12px;
+  padding: 0 8px;
   transition: all 150ms;
   background-color: transparent;
   border: 2px solid transparent;
   border-radius: 4px;
   cursor: pointer;
+  text-decoration: none;
+  &:has(> .btn__icon:only-child) {
+    border-radius: 99999px;
+    padding: 0;
+    width: 32px;
+  }
   &_primary {
     background-color: var(--bg-action);
     color: var(--text-button);
-    stroke: var(--graphic-button);
+    fill: var(--graphic-button);
     &:hover {
       background-color: var(--bg-hover);
     }
     &:active {
       background-color: var(--bg-active);
     }
-    &:disabled {
+    &:disabled, &-disabled {
       color: var(--text-disable);
       background-color: var(--bg-disable);
       cursor: not-allowed;
-      stroke: var(--graphic-disable);
+      fill: var(--graphic-disable);
     }
   }
   &_secondary {
     border-color: var(--border-button);
     color: var(--text-primary);
-    stroke: var(--graphic-primary);
+    fill: var(--graphic-primary);
     &:hover {
       border-color: var(--border-button-hover);
     }
     &:active {
       border-color: var(--border-button-active);
     }
-    &:disabled {
+    &:disabled, &-disabled {
       border-color: var(--border-disable);
       color: var(--text-disable);
       cursor: not-allowed;
-      stroke: var(--graphic-disable);
+      fill: var(--graphic-disable);
     }
   }
-  &_tertiary {
-    stroke: var(--graphic-primary);
+  &_tertiary{
+    fill: var(--graphic-primary);
     color: var(--text-primary);
     &:hover {
       border-color: var(--border-button-hover);
@@ -57,15 +63,15 @@
     &:active {
       border-color: var(--border-button-active);
     }
-    &:disabled {
+    &:disabled, &-disabled {
       border-color: transparent;
       color: var(--text-disable);
       cursor: not-allowed;
-      stroke: var(--graphic-disable);
+      fill: var(--graphic-disable);
     }
   }
   &_negative {
-    stroke: var(--graphic-negative);
+    fill: var(--graphic-negative);
     color: var(--text-negative);
     &:hover {
       border-color: var(--border-negative);
@@ -73,9 +79,9 @@
     &:active {
       border-color: var(--border-negative-secondary);
     }
-    &:disabled {
+    &:disabled, &-disabled {
       border-color: transparent;
-      stroke: var(--graphic-disable);
+      fill: var(--graphic-disable);
       cursor: not-allowed;
       color: var(--text-disable);
     }
