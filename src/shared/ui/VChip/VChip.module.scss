@@ -10,6 +10,9 @@
   gap: 4px;
   justify-items: center;
   align-items: center;
+  &:has(.chip__icon) {
+    gap: 8px;
+  }
   &_default {
     background-color: var(--bg-primary);
     color: var(--text-primary);
@@ -35,6 +38,12 @@
     color: var(--text-positive);
     fill: var(--graphic-positive);
   }
+  &__content {
+    display: flex;
+    gap: 4px;
+    justify-items: center;
+    align-items: center;
+  }
   &__remove {
     background-color: transparent;
     border: none;
@@ -47,8 +56,11 @@
     cursor: pointer;
   }
   &__remove_icon {
-    stroke-width: 1;
     height: 8px;
     width: 8px;
+  }
+  &__icon {
+    height: 10px;
+    width: 10px;
   }
 }
