@@ -1,0 +1,54 @@
+@use '../../styles/mixins' as *;
+
+.chip {
+  @include text(s);
+  height: 18px;
+  width: fit-content;
+  border-radius: 99999px;
+  padding: 0 6px;
+  display: flex;
+  gap: 4px;
+  justify-items: center;
+  align-items: center;
+  &_default {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    fill: var(--graphic-primary);
+  }
+  &_accent {
+    background-color: var(--bg-action);
+    color: var(--text-button);
+    fill: var(--graphic-button);
+  }
+  &_negative {
+    background-color: var(--bg-negative-secondary);
+    color: var(--text-negative);
+    fill: var(--graphic-negative);
+  }
+  &_info {
+    background-color: var(--bg-warning-secondary);
+    color: var(--text-warning);
+    fill: var(--graphic-warning);
+  }
+  &_positive {
+    background-color: var(--bg-positive-secondary);
+    color: var(--text-positive);
+    fill: var(--graphic-positive);
+  }
+  &__remove {
+    background-color: transparent;
+    border: none;
+    border-radius: 9999px;
+    padding: 0;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    cursor: pointer;
+  }
+  &__remove_icon {
+    stroke-width: 1;
+    height: 8px;
+    width: 8px;
+  }
+}
