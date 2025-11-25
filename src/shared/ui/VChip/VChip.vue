@@ -37,13 +37,15 @@ function getVariantClass(): string | undefined {
 </script>
 
 <template>
-  <div :class="[$s.chip, getVariantClass()]" @click.self="emits('clicked')">
-    <VIcon v-if="iconLeft" :name="iconLeft" :class-name="$s.chip__icon" />
-    <slot>
-      Chip
-    </slot>
-    <VIcon v-if="iconRight" :name="iconRight" :class-name="$s.chip__icon" />
-    <button v-if="removable" aria-label="remove" type="button" :class="$s.chip__remove" @click="emits('removed')">
+  <div :class="[$s.chip, getVariantClass()]" @click="emits('clicked')">
+    <div :class="$s.chip__content">
+      <VIcon v-if="iconLeft" :name="iconLeft" :class-name="$s.chip__icon" />
+      <slot>
+        Chip
+      </slot>
+      <VIcon v-if="iconRight" :name="iconRight" :class-name="$s.chip__icon" />
+    </div>
+    <button v-if="removable" aria-label="remove" type="button" :class="$s.chip__remove" @click.stop="emits('removed')">
       <VIcon name="x" :class-name="$s.chip__remove_icon" aria-label="remove" />
     </button>
   </div>
