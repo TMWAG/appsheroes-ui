@@ -3,7 +3,7 @@ import VChip from "./VChip.vue";
 
 const meta = {
   component: VChip,
-  title: 'Chip',
+  title: 'Components/Chip',
   tags: ['autodocs'],
   render: (args) => ({
     components: { VChip },

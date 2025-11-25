@@ -3,7 +3,7 @@ import VButton from './VButton.vue';
 
 const meta = {
   component: VButton,
-  title: 'Button',
+  title: 'Components/Button',
   tags: ['autodocs'],
   render: (args) => ({
     components: { VButton },

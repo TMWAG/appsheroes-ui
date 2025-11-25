@@ -3,7 +3,7 @@ import VIcon from './VIcon.vue';
 
 const meta = {
   component: VIcon,
-  title: 'Icon',
+  title: 'Components/Icon',
   tags: ['autodocs'],
   render: (args) => ({
     components: { VIcon },
