@@ -88,3 +88,32 @@ export const RemovablePositive: Story = {
     removable: true,
   },
 };
+
+export const IconLeft: Story = {
+  args: {
+    ...Default.args,
+    iconLeft: 'archive',
+  },
+};
+
+export const IconRight: Story = {
+  args: {
+    ...Default.args,
+    iconRight: 'info',
+  },
+};
+
+export const BothIcons: Story = {
+  args: {
+    ...Default.args,
+    iconLeft: 'archive',
+    iconRight: 'archive',
+  }
+}
+
+export const BothIconsRemovable: Story = {
+  args: {
+    ...BothIcons.args,
+    removable: true,
+  }
+}
