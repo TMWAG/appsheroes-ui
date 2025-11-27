@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { BOOTSTRAP_SPRITE_URL } from '@/shared/assets/icons/bootstrap';
 import { supportedIconMap, type IconNames } from './supportedIconMap'
+
+const SPRITE_URL = '/icons/bootstrap-icons.svg';
 
 const props = defineProps<{
   /** Icon name from bootstrap icons */
@@ -13,7 +14,7 @@ const props = defineProps<{
 }>();
 
 const isDecorative = computed(() => !props.ariaLabel);
-const href = computed(() => `${BOOTSTRAP_SPRITE_URL}#${supportedIconMap[props.name]}`);
+const href = computed(() => `${SPRITE_URL}#${supportedIconMap[props.name]}`);
 </script>
 
 <template>
