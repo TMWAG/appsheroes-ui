@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  width: 200px;
   &:has(.input__error) .input__input {
     border-color: var(--border-negative);
   }
@@ -15,7 +14,7 @@
     @include text(m);
     color: var(--text-secondary);
     position: absolute;
-    top: 16px;
+    top: 12px;
     left: 8px;
     transition: all 150ms;
   }
@@ -23,6 +22,7 @@
     @include text(m);
     width: 100%;
     padding: 16px 8px 8px 8px;
+    height: 40px;
     border: 1px solid var(--border-default);
     border-radius: 4px;
     background-color: var(--bg-primary);
