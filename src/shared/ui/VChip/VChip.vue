@@ -37,7 +37,7 @@ function getVariantClass(): string | undefined {
 </script>
 
 <template>
-  <div :class="[$s.chip, getVariantClass()]" @click="emits('clicked')">
+  <div :class="[$s.chip, getVariantClass()]" @click="emits('clicked')" role="note">
     <div :class="$s.chip__content">
       <VIcon v-if="iconLeft" :name="iconLeft" :class-name="$s.chip__icon" />
       <slot>
