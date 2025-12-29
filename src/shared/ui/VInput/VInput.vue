@@ -97,7 +97,7 @@ onUpdated(() => {
 <template>
   <div :class="$s.input" ref="input">
     <div :class="$s.input__wrapper">
-      <button v-if="resettable && value" :class="$s.input__reset_button" @click.prevent="emits('reset')">
+      <button v-if="resettable && value" :class="$s.input__reset_button" @click.prevent="emits('reset')" type="button" aria-label="reset">
         <VIcon name="x" :class-name="$s.input__reset_icon"/>
       </button>
       <input type="text" placeholder=" " :name="name" :id="inputId" :value="value" :class="$s.input__input"

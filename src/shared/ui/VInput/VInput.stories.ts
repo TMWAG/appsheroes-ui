@@ -3,7 +3,7 @@ import VInput from "./VInput.vue";
 
 const meta = {
   component: VInput,
-  title: 'Input',
+  title: 'Components/Input',
   render: (args) => ({
     components: { VInput },
     setup() {
@@ -24,13 +24,6 @@ export const Default: Story = {
   },
 };
 
-export const Resettable: Story = {
-  args: {
-    ...Default.args,
-    resettable: true,
-  }
-}
-
 export const Filled: Story = {
   args: {
     label: 'Label',
@@ -38,6 +31,14 @@ export const Filled: Story = {
     value: 'Value'
   }
 };
+
+export const Resettable: Story = {
+  args: {
+    ...Default.args,
+    resettable: true,
+    value: 'value',
+    }
+}
 
 export const Caption: Story = {
   args: {
