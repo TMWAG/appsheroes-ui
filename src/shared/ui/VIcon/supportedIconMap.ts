@@ -21,6 +21,8 @@ export const supportedIconMap = {
   trash: 'trash3',
   upload: 'file-earmark-arrow-up',
   x: 'x-lg',
+  square: 'square',
+  check: 'check-square',
 } as const;
 
 export type IconNames = keyof typeof supportedIconMap;
