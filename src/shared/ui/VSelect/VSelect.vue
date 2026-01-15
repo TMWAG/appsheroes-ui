@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-// import { VChip } from '../VChip';
+import { VChip } from '../VChip';
 import { VIcon } from '../VIcon';
 import $s from './VSelect.module.scss';
 
@@ -244,15 +244,16 @@ onBeforeUnmount(() => {
       <span :class="$s['select__label']">{{ label }}</span>
       <div :class="$s['select__chips']">
         <slot name="chip"
-          v-for="(o, idx) in selectedOptions"
+          v-for="o in selectedOptions"
           :option="o"
           :removeFn="toggleOption"
           :removable="multiple">
-          <span role="note"
-            @click="multiple ? toggleOption(o): null"
-            :key="o.value">
-            {{ o.label }}<template v-if="multiple && idx < selectedOptions.length - 1">,</template>
-          </span>
+          <VChip
+            :removable="multiple"
+            :key="o.value"
+            @removed="toggleOption(o)">
+            {{ o.label }}
+          </VChip>
         </slot>
       </div>
     </div>
