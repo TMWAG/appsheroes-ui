@@ -3,7 +3,6 @@
 .select {
   position: relative;
   width: 200px;
-  transition: width 150ms;
   &__wrapper {
     position: relative;
     border: 1px solid var(--border-default);
@@ -15,9 +14,15 @@
     outline: none;
     &:hover {
       border-color: var(--border-hover);
+      & > .select__reset {
+        opacity: 100;
+      }
     }
     &:focus, &:focus-within {
       border-color: var(--border-active);
+      & > .select__reset {
+        opacity: 100;
+      }
     }
     &:focus > .select__label,
     &:focus-within > .select__label,
@@ -26,29 +31,39 @@
         top: 4px;
         color: var(--text-primary);
     }
-    &_reset {
-      display: flex;
-      align-items: center;
-      justify-items: center;
-      position: absolute;
-      right: 0.5rem;
-      top: 50%;
-      transform: translateY(-50%);
+  }
+  &__chevron {
+    position: absolute;
+    background-color: var(--bg-primary);
+    right: 8px;
+    top: calc(50% - 4px);
+    transition: rotate 200ms;
+    height: 12px;
+    width: 12px;
+    fill: var(--graphic-primary);
+    rotate: 0deg;
+    &--active {
+      rotate: -180deg;
+    }
+  }
+  &__reset {
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    position: absolute;
+    right: 1.75rem;
+    top: 12px;
+    background-color: var(--bg-secondary);
+    transition: all 150ms;
+    border: none;
+    height: 1rem;
+    width: 1rem;
+    border-radius: 9999px;
+    padding: 0.2rem;
+    cursor: pointer;
+    &:hover {
       background-color: var(--bg-disable);
-      transition: background-color 150ms;
-      border: none;
-      height: 1rem;
-      width: 1rem;
-      border-radius: 9999px;
-      padding: 0.2rem;
-      cursor: pointer;
-      &_icon {
-        height: 100%;
-        width: 100%;
-      }
-      &:hover {
-        background-color: var(--bg-base);
-      }
     }
   }
   &__chips {
@@ -57,6 +72,8 @@
     overflow-x: auto;
     scrollbar-width: none;
     overflow-y: hidden;
+    width: calc(100% - 16px);
+    @include text(m);
   }
   &__label {
     @include text(m);
@@ -73,7 +90,6 @@
     left: 0;
     background-color: var(--bg-primary);
     width: 100%;
-    // max-width:fit-content;
     border: 1px solid var(--border-default);
     border-radius: 4px;
     display: flex;
@@ -96,26 +112,26 @@
     &:last-of-type {
       border-radius: 0 0 3px 3px;
     }
-    &_focused, &:hover {
+    &--focused, &:hover {
       background-color: var(--bg-secondary);
     }
-    &_content {
+    &-content {
       display: flex;
       gap: 6px;
       align-items: center;
     }
-    &_label {
+    &-label {
       color: var(--text-primary);
     }
-    &_notice {
+    &-notice {
       color: var(--text-secondary);
     }
-    &_icon {
+    &-icon {
       height: 15px;
       width: 15px;
       fill: var(--graphic-primary);
     }
-    &_image {
+    &-image {
       height: 20px;
       width: 20px;
       border-radius: 2px;

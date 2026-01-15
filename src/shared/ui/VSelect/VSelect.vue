@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { VChip } from '../VChip';
+// import { VChip } from '../VChip';
 import { VIcon } from '../VIcon';
 import $s from './VSelect.module.scss';
 
@@ -37,7 +37,7 @@ const emits = defineEmits<{
 
 defineSlots<{
   /** Use to customize chip's content */
-  chip(props: {option: SelectOption}): HTMLElement;
+  chip(props: {option: SelectOption, removeFn: (o: SelectOption)=> void, removable: boolean }): HTMLElement;
   /** Use to customize option list content */
   option(props: {option: SelectOption, selected: boolean}): HTMLElement;
 }>();
@@ -59,7 +59,9 @@ const valueSet = computed(() => new Set(
 const selectedOptions = computed(
   () => props.options.filter(o => valueSet.value.has(o.value))
 );
-
+const chevronClasses = computed(() =>
+  `${$s['select__chevron']} ${isOpen.value ? $s['select__chevron--active'] : ''}`
+);
 watch(
   () => props.options,
   (opts) => {
@@ -73,13 +75,13 @@ function open() {
   isOpen.value = true;
   const currentIndex = internalOptions.value.findIndex(o => valueSet.value.has(o.value));
   focusedIndex.value = currentIndex !== -1 ? currentIndex : (internalOptions.value.length ? 0 : null);
-}
+};
 function close() {
   if (!isOpen.value) return;
   isOpen.value = false;
   focusedIndex.value = null;
   clearSearch();
-}
+};
 
 function clearSearch() {
   searchQuery.value = '';
@@ -87,7 +89,7 @@ function clearSearch() {
     clearTimeout(resetTimer);
     resetTimer = null;
   }
-}
+};
 
 function focusNext() {
   if (!internalOptions.value.length) return;
@@ -96,7 +98,7 @@ function focusNext() {
   } else {
     focusedIndex.value = (focusedIndex.value + 1) % internalOptions.value.length;
   }
-}
+};
 
 function focusPrev() {
   if (!internalOptions.value.length) return;
@@ -106,7 +108,7 @@ function focusPrev() {
     focusedIndex.value =
       (focusedIndex.value - 1 + internalOptions.value.length) % internalOptions.value.length;
   }
-}
+};
 
 function toggleOption(option: SelectOption) {
   if (props.multiple) {
@@ -126,7 +128,7 @@ function selectFocused() {
   const opt = internalOptions.value[focusedIndex.value];
   if (!opt) return;
   toggleOption(opt);
-}
+};
 
 function reset() {
   if (select.value) select.value.focus();
@@ -135,14 +137,14 @@ function reset() {
 };
 function onOptionMouseEnter(idx: number) {
   focusedIndex.value = idx;
-}
+};
 function onOptionClick(option: SelectOption, idx: number) {
   focusedIndex.value = idx;
   toggleOption(option);
   if (!props.multiple) {
     clearSearch();
   }
-}
+};
 
 function onWrapperKeydown(e: KeyboardEvent) {
   const key = e.key;
@@ -221,8 +223,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :class="$s.select" ref="rootEl">
-    <div :class="$s.select__wrapper"
+  <div :class="$s['select']" ref="rootEl">
+    <div :class="$s['select__wrapper']"
       tabindex="0"
       ref="select"
       @keydown="onWrapperKeydown"
@@ -230,48 +232,51 @@ onBeforeUnmount(() => {
       role="combobox"
       :aria-expanded="isOpen"
       :aria-haspopup="'listbox'">
+      <VIcon name="chevron" :class-name="chevronClasses"/>
       <button
         v-if="resettable && valueSet.size"
         type="button"
         role="reset"
-        :class="$s.select__wrapper_reset"
+        :class="$s['select__reset']"
         @click.stop="reset">
-        <VIcon name="x" :class-name="$s.select__wrapper_reset_icon"/>
+        <VIcon name="x" :class-name="$s['select__reset-icon']"/>
       </button>
-      <span :class="$s.select__label">{{ label }}</span>
-      <div :class="$s.select__chips">
-        <VChip class="chip"
-          v-for="o in selectedOptions"
-          :removable="multiple"
-          :key="o.value"
-          @removed="toggleOption(o)">
-          <slot name="chip" :option="o">
-            {{ o.label }}
-          </slot>
-        </VChip>
+      <span :class="$s['select__label']">{{ label }}</span>
+      <div :class="$s['select__chips']">
+        <slot name="chip"
+          v-for="(o, idx) in selectedOptions"
+          :option="o"
+          :removeFn="toggleOption"
+          :removable="multiple">
+          <span role="note"
+            @click="multiple ? toggleOption(o): null"
+            :key="o.value">
+            {{ o.label }}<template v-if="multiple && idx < selectedOptions.length - 1">,</template>
+          </span>
+        </slot>
       </div>
     </div>
-    <div :class="$s.select__options" v-show="isOpen" role="listbox" :aria-hidden="!isOpen" tabindex="0" @keydown="onWrapperKeydown">
+    <div :class="$s['select__options']" v-show="isOpen" role="listbox" :aria-hidden="!isOpen" tabindex="0" @keydown="onWrapperKeydown">
       <button
         v-for="(o, idx) in internalOptions"
         role="listitem"
-        :class="[$s.select__item, idx === focusedIndex ? $s.select__item_focused: '']"
+        :class="[$s['select__item'], idx === focusedIndex ? $s['select__item--focused']: '']"
         :key="o.value"
         :aria-selected="valueSet.has(o.value)"
         @mouseenter="onOptionMouseEnter(idx)"
         @click="onOptionClick(o, idx)">
         <slot name="option" :option="o" :selected="valueSet.has(o.value)">
-          <div :class="$s.select__item_content">
+          <div :class="$s['select__item-content']">
             <VIcon
               v-if="multiple"
               :name="valueSet.has(o.value) ? 'check' :'square'"
-              :class-name="$s.select__item_icon" />
-            <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s.select__item_image">
-            <span :class="$s.select__item_label">
+              :class-name="$s['select__item-icon']" />
+            <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']">
+            <span :class="$s['select__item-label']">
               {{ o.label }}
             </span>
           </div>
-          <span v-if="o.notice" :class="$s.select__item_notice">
+          <span v-if="o.notice" :class="$s['select__item-notice']">
             {{ o.notice }}
           </span>
         </slot>
