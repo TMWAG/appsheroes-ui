@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
       @focus="open"
       role="combobox"
       :aria-expanded="isOpen"
-      :aria-haspopup="'listbox'">
+      aria-haspopup="listbox">
       <VIcon name="chevron" :class-name="chevronClasses"/>
       <button
         v-if="resettable && valueSet.size"
@@ -248,8 +248,7 @@ onBeforeUnmount(() => {
           :option="o"
           :removeFn="toggleOption"
           :removable="multiple">
-          <VChip
-            :removable="multiple"
+          <VChip :removable="multiple"
             :key="o.value"
             @removed="toggleOption(o)">
             {{ o.label }}
