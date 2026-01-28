@@ -9,7 +9,7 @@ const meta = {
     setup() {
       return { args };
     },
-    template: '<VInput v-bind="args"/>',
+    template: '<div style="width: 200px"><VInput v-bind="args"/></div>',
   })
 } satisfies Meta<typeof VInput>
 
