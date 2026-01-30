@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/vue3-vite";
-import VChip from "./VChip.vue";
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import VChip from './VChip.vue';
 
 const meta = {
   component: VChip,
@@ -11,8 +11,7 @@ const meta = {
       return { args };
     },
     template: '<VChip v-bind="args">{{args.default}}</VChip>',
-  })
-
+  }),
 } satisfies Meta<typeof VChip>;
 
 export default meta;
@@ -108,12 +107,12 @@ export const BothIcons: Story = {
     ...Default.args,
     iconLeft: 'archive',
     iconRight: 'archive',
-  }
-}
+  },
+};
 
 export const BothIconsRemovable: Story = {
   args: {
     ...BothIcons.args,
     removable: true,
-  }
-}
+  },
+};
