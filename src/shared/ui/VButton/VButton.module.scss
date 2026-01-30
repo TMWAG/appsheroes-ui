@@ -30,7 +30,8 @@
     &:active {
       background-color: var(--bg-active);
     }
-    &:disabled, &-disabled {
+    &:disabled,
+    &-disabled {
       color: var(--text-disable);
       background-color: var(--bg-disable);
       cursor: not-allowed;
@@ -47,14 +48,15 @@
     &:active {
       border-color: var(--border-button-active);
     }
-    &:disabled, &-disabled {
+    &:disabled,
+    &-disabled {
       border-color: var(--border-disable);
       color: var(--text-disable);
       cursor: not-allowed;
       fill: var(--graphic-disable);
     }
   }
-  &_tertiary{
+  &_tertiary {
     fill: var(--graphic-primary);
     color: var(--text-primary);
     &:hover {
@@ -63,7 +65,8 @@
     &:active {
       border-color: var(--border-button-active);
     }
-    &:disabled, &-disabled {
+    &:disabled,
+    &-disabled {
       border-color: transparent;
       color: var(--text-disable);
       cursor: not-allowed;
@@ -79,7 +82,8 @@
     &:active {
       border-color: var(--border-negative-secondary);
     }
-    &:disabled, &-disabled {
+    &:disabled,
+    &-disabled {
       border-color: transparent;
       fill: var(--graphic-disable);
       cursor: not-allowed;

@@ -78,27 +78,27 @@ export const IconOnly: Story = {
   args: {
     variant: 'primary',
     icon: 'plus',
-  }
-}
+  },
+};
 
 export const IconLeft: Story = {
   args: {
     ...Primary.args,
     iconLeft: 'plus',
-  }
-}
+  },
+};
 
 export const IconRight: Story = {
   args: {
     ...Primary.args,
-    iconRight: 'plus'
-  }
-}
+    iconRight: 'plus',
+  },
+};
 
 export const BothIcons: Story = {
   args: {
     ...Primary.args,
     iconLeft: 'plus',
     iconRight: 'plus',
-  }
-}
+  },
+};
