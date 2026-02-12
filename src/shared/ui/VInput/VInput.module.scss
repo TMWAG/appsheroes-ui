@@ -35,7 +35,8 @@
     &:hover {
       border-color: var(--border-hover);
     }
-    &:focus, &:focus-within {
+    &:focus,
+    &:focus-within {
       border-color: var(--border-active);
       outline: none;
     }
@@ -79,7 +80,8 @@
   &__error {
     color: var(--text-negative);
   }
-  &__caption,&__error {
+  &__caption,
+  &__error {
     @include text(s);
     height: 1rem;
     overflow: hidden;

@@ -15,10 +15,7 @@ const props = withDefaults(
     /** Defines presents of close button and emission on closed event */
     removable?: boolean;
   }>(),
-  {
-    variant: 'default',
-    removable: false,
-  },
+  { variant: 'default', removable: false },
 );
 
 const emits = defineEmits<{
@@ -39,20 +36,31 @@ function getVariantClass(): string | undefined {
 </script>
 
 <template>
-  <div :class="[$s.chip, getVariantClass()]" @click="emits('clicked')" role="note">
+  <div
+    :class="[$s.chip, getVariantClass()]"
+    @click="emits('clicked')"
+    role="note">
     <div :class="$s.chip__content">
-      <VIcon v-if="iconLeft" :name="iconLeft" :class-name="$s.chip__icon" />
+      <VIcon
+        v-if="iconLeft"
+        :name="iconLeft"
+        :class-name="$s.chip__icon" />
       <slot> Chip </slot>
-      <VIcon v-if="iconRight" :name="iconRight" :class-name="$s.chip__icon" />
+      <VIcon
+        v-if="iconRight"
+        :name="iconRight"
+        :class-name="$s.chip__icon" />
     </div>
     <button
       v-if="removable"
       aria-label="remove"
       type="button"
       :class="$s.chip__remove"
-      @click.stop="emits('removed')"
-    >
-      <VIcon name="x" :class-name="$s.chip__remove_icon" aria-label="remove" />
+      @click.stop="emits('removed')">
+      <VIcon
+        name="x"
+        :class-name="$s.chip__remove_icon"
+        aria-label="remove" />
     </button>
   </div>
 </template>

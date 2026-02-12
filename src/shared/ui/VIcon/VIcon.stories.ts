@@ -12,7 +12,7 @@ const meta = {
     },
     template: '<VIcon v-bind="args"/>',
   }),
-} satisfies Meta<typeof VIcon>
+} satisfies Meta<typeof VIcon>;
 
 export default meta;
 

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/vue3-vite";
-import VInput from "./VInput.vue";
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import VInput from './VInput.vue';
 
 const meta = {
   component: VInput,
@@ -10,8 +10,8 @@ const meta = {
       return { args };
     },
     template: '<div style="width: 200px"><VInput v-bind="args"/></div>',
-  })
-} satisfies Meta<typeof VInput>
+  }),
+} satisfies Meta<typeof VInput>;
 
 export default meta;
 
@@ -28,8 +28,8 @@ export const Filled: Story = {
   args: {
     label: 'Label',
     name: 'test',
-    value: 'Value'
-  }
+    value: 'Value',
+  },
 };
 
 export const Resettable: Story = {
@@ -37,14 +37,15 @@ export const Resettable: Story = {
     ...Default.args,
     resettable: true,
     value: 'value',
-    }
-}
+  },
+};
 
 export const Caption: Story = {
   args: {
     label: 'Label',
     name: 'test',
-    caption: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.',
+    caption:
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.',
   },
 };
 
@@ -52,7 +53,8 @@ export const Error: Story = {
   args: {
     label: 'Label',
     name: 'test',
-    error: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.'
+    error:
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.',
   },
 };
 
@@ -60,7 +62,9 @@ export const ErrorAndCaption: Story = {
   args: {
     label: 'Label',
     name: 'test',
-    caption: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.',
-    error: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.'
-  }
-}
+    caption:
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.',
+    error:
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quae nesciunt maiores aliquid, hic earum dicta, iste laborum doloribus sed praesentium inventore ipsa omnis voluptate sapiente natus recusandae pariatur libero.',
+  },
+};
