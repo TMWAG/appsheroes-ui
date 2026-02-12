@@ -2,7 +2,6 @@
 
 .select {
   position: relative;
-  width: 200px;
   &__wrapper {
     position: relative;
     border: 1px solid var(--border-default);
@@ -18,7 +17,8 @@
         opacity: 100;
       }
     }
-    &:focus, &:focus-within {
+    &:focus,
+    &:focus-within {
       border-color: var(--border-active);
       & > .select__reset {
         opacity: 100;
@@ -26,10 +26,10 @@
     }
     &:focus > .select__label,
     &:focus-within > .select__label,
-    &.select__wrapper:has([role="note"]) > .select__label {
-        @include text(xs);
-        top: 4px;
-        color: var(--text-primary);
+    &.select__wrapper:has([role='note']) > .select__label {
+      @include text(xs);
+      top: 4px;
+      color: var(--text-primary);
     }
   }
   &__chevron {
@@ -112,7 +112,8 @@
     &:last-of-type {
       border-radius: 0 0 3px 3px;
     }
-    &--focused, &:hover {
+    &--focused,
+    &:hover {
       background-color: var(--bg-secondary);
     }
     &-content {

@@ -5,41 +5,48 @@ import { VIcon } from '../VIcon';
 import $s from './VSelect.module.scss';
 
 export type SelectOption<T = string> = {
-  value: T,
-  label: string,
-  image?: string,
-  notice?: string,
+  value: T;
+  label: string;
+  image?: string;
+  notice?: string;
 };
 
-const props = withDefaults(defineProps<{
-  /** Defines input's label */
-  label: string,
-  /** Select's options */
-  options: SelectOption[],
-  /** Selected value[s] */
-  modelValue: string | string[],
-  /** Optionally defines input's name, if needed in form data constructor */
-  name?: string,
-  /** Defines multi select functionality */
-  multiple?: boolean,
-  /** Defines ability to reset all values */
-  resettable?: boolean,
-}>(), {
-  name: 'select',
-  multiple: false,
-});
+const props = withDefaults(
+  defineProps<{
+    /** Defines input's label */
+    label: string;
+    /** Select's options */
+    options: SelectOption[];
+    /** Selected value[s] */
+    modelValue: string | string[];
+    /** Optionally defines input's name, if needed in form data constructor */
+    name?: string;
+    /** Defines multi select functionality */
+    multiple?: boolean;
+    /** Defines ability to reset all values */
+    resettable?: boolean;
+  }>(),
+  {
+    name: 'select',
+    multiple: false,
+  },
+);
 
 const emits = defineEmits<{
-  'update:modelValue': [value: string | string[]],
-  change: [value: string | string[]],
-  reset: [],
+  'update:modelValue': [value: string | string[]];
+  change: [value: string | string[]];
+  reset: [];
 }>();
 
 defineSlots<{
   /** Use to customize chip's content */
-  chip(props: {option: SelectOption, removeFn: (o: SelectOption)=> void, removable: boolean }): HTMLElement;
+  chip(props: {
+    option: SelectOption;
+    removeFn: (o: SelectOption) => void;
+    removable: boolean;
+  }): HTMLElement;
   /** Use to customize option list content */
-  option(props: {option: SelectOption, selected: boolean}): HTMLElement;
+  option(props: { option: SelectOption; selected: boolean }): HTMLElement;
 }>();
 
 const rootEl = ref<HTMLElement | null>(null);
@@ -53,14 +60,12 @@ const internalOptions = ref<SelectOption[]>([...props.options]);
 
 let resetTimer: number | null = null;
 
-const valueSet = computed(() => new Set(
-  Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue],
-));
-const selectedOptions = computed(
-  () => props.options.filter(o => valueSet.value.has(o.value))
+const valueSet = computed(
+  () => new Set(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]),
 );
-const chevronClasses = computed(() =>
-  `${$s['select__chevron']} ${isOpen.value ? $s['select__chevron--active'] : ''}`
+const selectedOptions = computed(() => props.options.filter((o) => valueSet.value.has(o.value)));
+const chevronClasses = computed(
+  () => `${$s['select__chevron']} ${isOpen.value ? $s['select__chevron--active'] : ''}`,
 );
 watch(
   () => props.options,
@@ -73,15 +78,15 @@ watch(
 function open() {
   if (isOpen.value) return;
   isOpen.value = true;
-  const currentIndex = internalOptions.value.findIndex(o => valueSet.value.has(o.value));
-  focusedIndex.value = currentIndex !== -1 ? currentIndex : (internalOptions.value.length ? 0 : null);
-};
+  const currentIndex = internalOptions.value.findIndex((o) => valueSet.value.has(o.value));
+  focusedIndex.value = currentIndex !== -1 ? currentIndex : internalOptions.value.length ? 0 : null;
+}
 function close() {
   if (!isOpen.value) return;
   isOpen.value = false;
   focusedIndex.value = null;
   clearSearch();
-};
+}
 
 function clearSearch() {
   searchQuery.value = '';
@@ -89,7 +94,7 @@ function clearSearch() {
     clearTimeout(resetTimer);
     resetTimer = null;
   }
-};
+}
 
 function focusNext() {
   if (!internalOptions.value.length) return;
@@ -98,7 +103,7 @@ function focusNext() {
   } else {
     focusedIndex.value = (focusedIndex.value + 1) % internalOptions.value.length;
   }
-};
+}
 
 function focusPrev() {
   if (!internalOptions.value.length) return;
@@ -108,13 +113,13 @@ function focusPrev() {
     focusedIndex.value =
       (focusedIndex.value - 1 + internalOptions.value.length) % internalOptions.value.length;
   }
-};
+}
 
 function toggleOption(option: SelectOption) {
   if (props.multiple) {
     const arr = Array.isArray(props.modelValue) ? [...props.modelValue] : [];
     const exists = valueSet.value.has(option.value);
-    const next = exists ? arr.filter(v => v !== option.value) : [...arr, option.value];
+    const next = exists ? arr.filter((v) => v !== option.value) : [...arr, option.value];
     emits('update:modelValue', next);
     emits('change', next);
   } else {
@@ -122,29 +127,29 @@ function toggleOption(option: SelectOption) {
     emits('change', option.value);
     close();
   }
-};
+}
 function selectFocused() {
   if (focusedIndex.value === null) return;
   const opt = internalOptions.value[focusedIndex.value];
   if (!opt) return;
   toggleOption(opt);
-};
+}
 
 function reset() {
   if (select.value) select.value.focus();
   isOpen.value = true;
   emits('reset');
-};
+}
 function onOptionMouseEnter(idx: number) {
   focusedIndex.value = idx;
-};
+}
 function onOptionClick(option: SelectOption, idx: number) {
   focusedIndex.value = idx;
   toggleOption(option);
   if (!props.multiple) {
     clearSearch();
   }
-};
+}
 
 function onWrapperKeydown(e: KeyboardEvent) {
   const key = e.key;
@@ -219,59 +224,71 @@ onMounted(() => {
 });
 onBeforeUnmount(() => {
   document.removeEventListener('click', onDocumentClick);
-})
+});
 </script>
 
 <template>
   <div :class="$s['select']" ref="rootEl">
-    <div :class="$s['select__wrapper']"
+    <div
+      :class="$s['select__wrapper']"
       tabindex="0"
       ref="select"
       @keydown="onWrapperKeydown"
       @focus="open"
       role="combobox"
       :aria-expanded="isOpen"
-      aria-haspopup="listbox">
-      <VIcon name="chevron" :class-name="chevronClasses"/>
+      aria-haspopup="listbox"
+    >
+      <VIcon name="chevron" :class-name="chevronClasses" />
       <button
         v-if="resettable && valueSet.size"
         type="button"
         role="reset"
         :class="$s['select__reset']"
-        @click.stop="reset">
-        <VIcon name="x" :class-name="$s['select__reset-icon']"/>
+        @click.stop="reset"
+      >
+        <VIcon name="x" :class-name="$s['select__reset-icon']" />
       </button>
       <span :class="$s['select__label']">{{ label }}</span>
       <div :class="$s['select__chips']">
-        <slot name="chip"
+        <slot
+          name="chip"
           v-for="o in selectedOptions"
           :option="o"
           :removeFn="toggleOption"
-          :removable="multiple">
-          <VChip :removable="multiple"
-            :key="o.value"
-            @removed="toggleOption(o)">
+          :removable="multiple"
+        >
+          <VChip :removable="multiple" :key="o.value" @removed="toggleOption(o)">
             {{ o.label }}
           </VChip>
         </slot>
       </div>
     </div>
-    <div :class="$s['select__options']" v-show="isOpen" role="listbox" :aria-hidden="!isOpen" tabindex="0" @keydown="onWrapperKeydown">
+    <div
+      :class="$s['select__options']"
+      v-show="isOpen"
+      role="listbox"
+      :aria-hidden="!isOpen"
+      tabindex="0"
+      @keydown="onWrapperKeydown"
+    >
       <button
         v-for="(o, idx) in internalOptions"
         role="listitem"
-        :class="[$s['select__item'], idx === focusedIndex ? $s['select__item--focused']: '']"
+        :class="[$s['select__item'], idx === focusedIndex ? $s['select__item--focused'] : '']"
         :key="o.value"
         :aria-selected="valueSet.has(o.value)"
         @mouseenter="onOptionMouseEnter(idx)"
-        @click="onOptionClick(o, idx)">
+        @click="onOptionClick(o, idx)"
+      >
         <slot name="option" :option="o" :selected="valueSet.has(o.value)">
           <div :class="$s['select__item-content']">
             <VIcon
               v-if="multiple"
-              :name="valueSet.has(o.value) ? 'check' :'square'"
-              :class-name="$s['select__item-icon']" />
-            <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']">
+              :name="valueSet.has(o.value) ? 'check' : 'square'"
+              :class-name="$s['select__item-icon']"
+            />
+            <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']" />
             <span :class="$s['select__item-label']">
               {{ o.label }}
             </span>
