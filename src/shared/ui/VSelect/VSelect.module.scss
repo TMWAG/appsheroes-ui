@@ -11,6 +11,7 @@
     padding: 16px 32px 8px 8px;
     background-color: var(--bg-primary);
     outline: none;
+    transition: opacity ease-in 150ms;
     &:hover {
       border-color: var(--border-hover);
       & > .select__reset {
@@ -30,6 +31,10 @@
       @include text(xs);
       top: 4px;
       color: var(--text-primary);
+    }
+    &--disabled {
+      pointer-events: none;
+      opacity: 0.6;
     }
   }
   &__chevron {

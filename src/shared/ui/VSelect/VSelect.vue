@@ -25,10 +25,13 @@ const props = withDefaults(
     multiple?: boolean;
     /** Defines ability to reset all values */
     resettable?: boolean;
+    /** Defines interactivity */
+    disabled?: boolean;
   }>(),
   {
     name: 'select',
     multiple: false,
+    disabled: false,
   },
 );
 
@@ -230,8 +233,11 @@ onBeforeUnmount(() => {
 <template>
   <div :class="$s['select']" ref="rootEl">
     <div
-      :class="$s['select__wrapper']"
-      tabindex="0"
+      :class="[
+        $s['select__wrapper'],
+        disabled ? $s['select__wrapper--disabled'] : '',
+      ]"
+      :tabindex="disabled ? -1 : 1"
       ref="select"
       @keydown="onWrapperKeydown"
       @focus="open"
