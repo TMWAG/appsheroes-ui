@@ -1,53 +1,51 @@
 @use '../../styles/mixins' as *;
 
-$gap: 4px;
-
 .tooltip {
   @include text(s);
-  z-index: 9999;
   padding: 4px 8px;
   border-radius: 4px;
-  position: absolute;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  max-width: 100%;
+  max-width: 25vw;
   width: max-content;
   pointer-events: none;
   display: inline-flex;
   flex-grow: 1;
-  &_left, &_right, &_top, &_bottom {
-    opacity: 0;
-    transition: opacity 200ms;
-  }
-  &_left, &_right {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  &_top, &_bottom {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  &_left {
-    right: calc(100% + $gap);
-  }
-  &_right {
-    left: calc(100% + $gap);
-  }
-  &_top {
-    bottom: calc(100% + $gap);
-  }
-  &_bottom {
-    top: calc(100% + $gap);
-  }
-  &__trigger {
-    position: relative;
-    &:hover .tooltip_left,
-    &:hover .tooltip_right,
-    &:hover .tooltip_top,
-    &:hover .tooltip_bottom {
-      opacity: 1;
-    }
-  }
 }
 
+.enter-from,
+.leave-to {
+  opacity: 0;
+}
 
+.enter-to,
+.leave-from {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.enter-active,
+.leave-active {
+  transition: opacity 300ms ease, transform 300ms ease;
+  will-change: opacity, transform;
+}
+
+.dir-top.enter-from,
+.dir-top.leave-to {
+  transform: translateY(6px);      // tooltip сверху, выезжает снизу
+}
+
+.dir-bottom.enter-from,
+.dir-bottom.leave-to {
+  transform: translateY(-6px);     // tooltip снизу, выезжает сверху
+}
+
+.dir-left.enter-from,
+.dir-left.leave-to {
+  transform: translateX(6px);      // tooltip слева, выезжает справа
+}
+
+.dir-right.enter-from,
+.dir-right.leave-to {
+  transform: translateX(-6px);     // tooltip справа, выезжает слева
+}

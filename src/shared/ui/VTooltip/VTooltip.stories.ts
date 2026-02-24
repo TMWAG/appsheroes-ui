@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/vue3-vite";
-import VTooltip from "./VTooltip.vue";
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import VTooltip from './VTooltip.vue';
 
 const meta = {
   component: VTooltip,
@@ -10,7 +10,8 @@ const meta = {
     setup() {
       return { args };
     },
-    template: '<VTooltip v-bind="args">{{args.default}}</VTooltip>',
+    template:
+      '<VTooltip v-bind="args">{{args.default}}<template #content>{{args.content}}</template></VTooltip>',
   }),
 } satisfies Meta<typeof VTooltip>;
 
@@ -21,7 +22,7 @@ type Story = StoryObj<typeof meta>;
 export const Left: Story = {
   args: {
     default: 'tooltip trigger',
-    text: 'tooltip',
+    content: 'tooltip',
     placement: 'left',
   },
 };
@@ -29,7 +30,7 @@ export const Left: Story = {
 export const Top: Story = {
   args: {
     default: 'tooltip trigger',
-    text: 'tooltip',
+    content: 'tooltip',
     placement: 'top',
   },
 };
@@ -37,7 +38,7 @@ export const Top: Story = {
 export const Bottom: Story = {
   args: {
     default: 'tooltip trigger',
-    text: 'tooltip',
+    content: 'tooltip',
     placement: 'bottom',
   },
 };
@@ -45,9 +46,7 @@ export const Bottom: Story = {
 export const Right: Story = {
   args: {
     default: 'tooltip trigger',
-    text: 'tooltip',
+    content: 'tooltip',
     placement: 'right',
   },
 };
-
-
