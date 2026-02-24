@@ -67,3 +67,24 @@ export const MultipleResettable: Story = {
   },
 };
 
+export const Disabled: Story = {
+  args: {
+    ...Default.args,
+    disabled: true,
+  }
+}
+
+export const DisabledSelected: Story = {
+  args: {
+    ...Disabled.args,
+    modelValue: ['1']
+  }
+}
+
+export const SelectedDisabledResettable: Story = {
+  args: {
+    ...DisabledSelected.args,
+    resettable: true,
+  }
+}
+
