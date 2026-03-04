@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends string | number">
 import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { VChip } from '../VChip';
 import { VIcon } from '../VIcon';
@@ -11,101 +11,126 @@ export type SelectOption<T = string> = {
   label: string;
   image?: string;
   notice?: string;
+  disabled?: boolean;
 };
 
 const props = withDefaults(
   defineProps<{
-    /** Defines input's label */
     label: string;
-    /** Select's options */
-    options: SelectOption[];
-    /** Selected value[s] */
-    modelValue: string | string[];
-    /** Optionally defines input's name, if needed in form data constructor */
+    options: SelectOption<T>[];
+    modelValue: T | T[] | null;
     name?: string;
-    /** Defines multi select functionality */
     multiple?: boolean;
-    /** Defines ability to reset all values */
     resettable?: boolean;
-    /** Defines interactivity */
     disabled?: boolean;
-    /** Defines if options list is loading */
     loading?: boolean;
+    placeholder?: string;
   }>(),
   {
     name: 'select',
     multiple: false,
     disabled: false,
+    placeholder: 'Select...',
   },
 );
 
 const emits = defineEmits<{
-  'update:modelValue': [value: string | string[]];
-  change: [value: string | string[]];
+  'update:modelValue': [value: T | T[] | null];
+  change: [value: T | T[] | null];
   reset: [];
+  open: [];
+  close: [];
 }>();
 
 defineSlots<{
-  /** Use to customize chip's content */
   chip(props: {
-    option: SelectOption;
-    removeFn: (o: SelectOption) => void;
+    option: SelectOption<T>;
+    removeFn: (o: SelectOption<T>) => void;
     removable: boolean;
   }): HTMLElement;
-  /** Use to customize option list content */
-  option(props: { option: SelectOption; selected: boolean }): HTMLElement;
-  /** Loading state customization */
+  option(props: { option: SelectOption<T>; selected: boolean }): HTMLElement;
   loader(): HTMLElement;
-  /** Text for cases where there is no options */
   noResultText(): HTMLElement;
 }>();
 
 const rootEl = ref<HTMLElement | null>(null);
-const select = ref<HTMLElement | null>(null);
+const triggerEl = ref<HTMLElement | null>(null);
 const virtualList = ref<VirtualScrollExpose | null>(null);
 
 const isOpen = ref<boolean>(false);
-const focusedIndex = ref<number | null>(null);
-
+const focusedIndex = ref<number>(-1);
 const searchQuery = ref<string>('');
-const internalOptions = ref<SelectOption[]>([...props.options]);
 
-let resetTimer: number | null = null;
+let resetTimer: ReturnType<typeof setTimeout> | null = null;
 
-const valueSet = computed(
-  () => new Set(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]),
+const valueArray = computed<T[]>(() => {
+  if (props.modelValue === null || props.modelValue === undefined) return [];
+  return Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue];
+});
+
+const valueSet = computed(() => new Set(valueArray.value));
+
+const selectedOptions = computed(() =>
+  props.options.filter((o) => valueSet.value.has(o.value))
 );
-const selectedOptions = computed(() => props.options.filter((o) => valueSet.value.has(o.value)));
+
 const chevronClasses = computed(
   () => `${$s['select__chevron']} ${isOpen.value ? $s['select__chevron--active'] : ''}`,
 );
 
-watch(
-  () => props.options,
-  (opts) => {
-    internalOptions.value = [...opts];
-  },
-  { deep: true },
-);
+const filteredOptions = computed(() => {
+  if (!searchQuery.value) {
+    return props.options;
+  }
+
+  const q = searchQuery.value.toLowerCase();
+  return [...props.options].sort((a, b) => {
+    const al = a.label.toLowerCase();
+    const bl = b.label.toLowerCase();
+    const aStarts = al.startsWith(q);
+    const bStarts = bl.startsWith(q);
+
+    if (aStarts && !bStarts) return -1;
+    if (!aStarts && bStarts) return 1;
+    return al.localeCompare(bl);
+  });
+});
+
+watch(filteredOptions, () => {
+  focusedIndex.value = -1;
+});
 
 function scrollToFocused() {
-  if (virtualList.value && focusedIndex.value !== null) {
+  if (virtualList.value && focusedIndex.value > -1) {
     virtualList.value.scrollToIndex(focusedIndex.value);
   }
 }
 
 function open() {
-  if (isOpen.value) return;
+  if (isOpen.value || props.disabled) return;
   isOpen.value = true;
-  const currentIndex = internalOptions.value.findIndex((o) => valueSet.value.has(o.value));
-  focusedIndex.value = currentIndex !== -1 ? currentIndex : internalOptions.value.length ? 0 : null;
-  nextTick(() => scrollToFocused());
+  emits('open');
+
+  const selectedIndex = filteredOptions.value.findIndex((o) => valueSet.value.has(o.value));
+  focusedIndex.value = selectedIndex !== -1 ? selectedIndex : 0;
+
+  nextTick(() => {
+    scrollToFocused();
+  });
 }
+
 function close() {
   if (!isOpen.value) return;
   isOpen.value = false;
-  focusedIndex.value = null;
+  focusedIndex.value = -1;
+  emits('close');
   clearSearch();
+}
+
+function toggleOpen() {
+  if (props.disabled) return;
+  if (isOpen.value) close();
+  else open();
 }
 
 function clearSearch() {
@@ -117,136 +142,145 @@ function clearSearch() {
 }
 
 function focusNext() {
-  if (!internalOptions.value.length) return;
-  if (focusedIndex.value === null) {
+  if (!filteredOptions.value.length) return;
+  const maxIndex = filteredOptions.value.length - 1;
+
+  if (focusedIndex.value >= maxIndex) {
     focusedIndex.value = 0;
   } else {
-    focusedIndex.value = (focusedIndex.value + 1) % internalOptions.value.length;
+    focusedIndex.value++;
   }
   scrollToFocused();
 }
 
 function focusPrev() {
-  if (!internalOptions.value.length) return;
-  if (focusedIndex.value === null) {
-    focusedIndex.value = internalOptions.value.length - 1;
+  if (!filteredOptions.value.length) return;
+
+  if (focusedIndex.value <= 0) {
+    focusedIndex.value = filteredOptions.value.length - 1;
   } else {
-    focusedIndex.value =
-      (focusedIndex.value - 1 + internalOptions.value.length) % internalOptions.value.length;
+    focusedIndex.value--;
   }
   scrollToFocused();
 }
 
-function toggleOption(option: SelectOption) {
+function toggleOption(option: SelectOption<T>) {
+  if (option.disabled) return;
+
   if (props.multiple) {
-    const arr = Array.isArray(props.modelValue) ? [...props.modelValue] : [];
+    const arr = [...valueArray.value];
     const exists = valueSet.value.has(option.value);
     const next = exists ? arr.filter((v) => v !== option.value) : [...arr, option.value];
     emits('update:modelValue', next);
     emits('change', next);
+    clearSearch();
   } else {
     emits('update:modelValue', option.value);
     emits('change', option.value);
     close();
   }
 }
+
 function selectFocused() {
-  if (focusedIndex.value === null) return;
-  const opt = internalOptions.value[focusedIndex.value];
-  if (!opt) return;
-  toggleOption(opt);
+  if (focusedIndex.value < 0 || focusedIndex.value >= filteredOptions.value.length) return;
+  const opt = filteredOptions.value[focusedIndex.value];
+  if (opt) toggleOption(opt);
 }
 
 function reset() {
-  if (select.value) select.value.focus();
-  isOpen.value = true;
+  const emptyValue = props.multiple ? [] : null;
+  emits('update:modelValue', emptyValue);
+  emits('change', emptyValue);
   emits('reset');
+  close();
+  if (triggerEl.value) triggerEl.value.focus();
 }
+
 function onOptionMouseEnter(idx: number) {
   focusedIndex.value = idx;
 }
-function onOptionClick(option: SelectOption, idx: number) {
+
+function onOptionClick(option: SelectOption<T>, idx: number) {
   focusedIndex.value = idx;
   toggleOption(option);
-  if (!props.multiple) {
-    clearSearch();
-  }
 }
 
 function onWrapperKeydown(e: KeyboardEvent) {
-  const key = e.key;
+  if (props.disabled) return;
 
-  if (key === 'ArrowDown') {
+  if (isOpen.value && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault();
+    searchQuery.value += e.key;
+    focusedIndex.value = 0;
+    scrollToFocused();
+
+    if (resetTimer !== null) clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => {
+      searchQuery.value = '';
+      resetTimer = null;
+    }, 2000);
+    return;
+  }
+
+  if (e.key === 'Backspace') {
+    if (searchQuery.value) {
+      e.preventDefault();
+      searchQuery.value = searchQuery.value.slice(0, -1);
+      focusedIndex.value = 0;
+    } else if (props.multiple && valueArray.value.length && !isOpen.value) {
+        e.preventDefault();
+        const arr = valueArray.value.slice(0, -1);
+        emits('update:modelValue', arr);
+        emits('change', arr);
+    }
+    return;
+  }
+
+  if (e.key === 'ArrowDown') {
     e.preventDefault();
     if (!isOpen.value) open();
     else focusNext();
     return;
   }
-  if (key === 'ArrowUp') {
+
+  if (e.key === 'ArrowUp') {
     e.preventDefault();
     if (!isOpen.value) open();
     else focusPrev();
     return;
   }
-  if (key === 'Enter' || key === ' ') {
-    if (isOpen.value) {
-      e.preventDefault();
-      selectFocused();
-    } else {
-      e.preventDefault();
+
+  if (e.key === 'Enter' || e.key === 'Space') {
+    e.preventDefault();
+    if (!isOpen.value) {
       open();
+    } else {
+      selectFocused();
     }
     return;
   }
-  if (key === 'Escape') {
-    if (isOpen.value) {
-      e.preventDefault();
-      close();
-    }
+
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    close();
     return;
   }
-  if (key.length !== 1 && key !== 'Backspace') return;
-  if (key === 'Backspace') {
-    searchQuery.value = searchQuery.value.slice(0, -1);
-  } else {
-    searchQuery.value += key;
-  }
-
-  const q = searchQuery.value.toLowerCase();
-  internalOptions.value = [...internalOptions.value].sort((a, b) => {
-    const al = a.label.toLowerCase();
-    const bl = b.label.toLowerCase();
-    const aStarts = al.startsWith(q);
-    const bStarts = bl.startsWith(q);
-    if (aStarts && !bStarts) return -1;
-    if (!aStarts && bStarts) return 1;
-    return al.localeCompare(bl);
-  });
-
-  focusedIndex.value = 0;
-  scrollToFocused();
-
-  if (resetTimer !== null) {
-    clearTimeout(resetTimer);
-  }
-  resetTimer = window.setTimeout(() => {
-    searchQuery.value = '';
-    resetTimer = null;
-  }, 2000);
 }
 
 function onDocumentClick(e: MouseEvent) {
   const target = e.target as Node | null;
-  if (!rootEl.value) return;
-  if (target && rootEl.value.contains(target)) return;
-  close();
+  if (rootEl.value && target && !rootEl.value.contains(target)) {
+    close();
+  }
 }
 
 onMounted(() => {
   document.addEventListener('click', onDocumentClick);
 });
+
 onBeforeUnmount(() => {
   document.removeEventListener('click', onDocumentClick);
+  if (resetTimer !== null) clearTimeout(resetTimer);
 });
 </script>
 
@@ -256,29 +290,39 @@ onBeforeUnmount(() => {
       :class="[
         $s['select__wrapper'],
         disabled ? $s['select__wrapper--disabled'] : '',
+        isOpen ? $s['select__wrapper--active'] : ''
       ]"
-      :tabindex="disabled ? -1 : 1"
-      ref="select"
+      :tabindex="disabled ? -1 : 0"
+      ref="triggerEl"
       @keydown="onWrapperKeydown"
-      @focus="open"
+      @click="toggleOpen"
       role="combobox"
       :aria-expanded="isOpen"
-      aria-haspopup="listbox">
+      aria-haspopup="listbox"
+      :aria-activedescendant="isOpen && focusedIndex > -1 ? `option-${focusedIndex}` : undefined"
+      :aria-label="label">
+
       <VIcon name="chevron" :class-name="chevronClasses" />
+
       <button
         v-if="resettable && valueSet.size"
         type="button"
-        role="reset"
+        tabindex="-1"
         :class="$s['select__reset']"
-        @click.stop="reset">
+        @click.stop="reset"
+        aria-label="Reset selection">
         <VIcon name="x" :class-name="$s['select__reset-icon']" />
       </button>
+
       <span :class="$s['select__label']">{{ label }}</span>
+
       <div :class="$s['select__chips']">
-        <VirtualScroll :items="selectedOptions"
+        <VirtualScroll
+          v-if="selectedOptions.length"
+          :items="selectedOptions"
           direction="horizontal"
-          :item-key="'select_chip'">
-          <template #default="{item}">
+          item-key="value">
+          <template #default="{ item }">
             <slot
               name="chip"
               :option="item"
@@ -292,33 +336,43 @@ onBeforeUnmount(() => {
         </VirtualScroll>
       </div>
     </div>
+
+    <!-- Dropdown -->
     <div
       :class="[
         $s['select__options'],
-        loading ?  $s['select__options--loading'] : '',
-        ]"
+        loading ? $s['select__options--loading'] : '',
+      ]"
       v-show="isOpen"
       role="listbox"
       :aria-hidden="!isOpen"
-      tabindex="0"
-      @keydown="onWrapperKeydown">
+      tabindex="-1">
+
       <template v-if="loading">
         <slot name="loader">
           <VLoader :infinite="true"/>
         </slot>
       </template>
+
       <template v-else>
-        <template v-if="internalOptions.length">
-          <VirtualScroll ref="virtualList"
-            :items="internalOptions"
-            :item-key="'value'"
+        <template v-if="filteredOptions.length">
+          <VirtualScroll
+            ref="virtualList"
+            :items="filteredOptions"
+            item-key="value"
             :class="$s['select__virtual-list']">
-            <template #default="{item: o, idx}">
+            <template #default="{ item: o, idx }">
               <button
-                role="listitem"
-                :class="[$s['select__item'], idx === focusedIndex ? $s['select__item--focused'] : '']"
+                :id="`option-${idx}`"
+                role="option"
+                :class="[
+                  $s['select__item'],
+                  idx === focusedIndex ? $s['select__item--focused'] : '',
+                  o.disabled ? $s['select__item--disabled'] : ''
+                ]"
                 :key="o.value"
                 :aria-selected="valueSet.has(o.value)"
+                :disabled="o.disabled"
                 @mouseenter="onOptionMouseEnter(idx)"
                 @click="onOptionClick(o, idx)">
                 <slot name="option" :option="o" :selected="valueSet.has(o.value)">
@@ -341,7 +395,9 @@ onBeforeUnmount(() => {
           </VirtualScroll>
         </template>
         <template v-else>
-          <slot name="noResultText"></slot>
+          <div :class="$s['select__no-result']">
+            <slot name="noResultText">No options found</slot>
+          </div>
         </template>
       </template>
     </div>
