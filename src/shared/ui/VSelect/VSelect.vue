@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { VChip } from '../VChip';
 import { VIcon } from '../VIcon';
 import $s from './VSelect.module.scss';
+import { VLoader } from '@/shared/ui/VLoader';
+import { VirtualScroll, type VirtualScrollExpose } from '@/shared/ui/VirtualScroll';
 
 export type SelectOption<T = string> = {
   value: T;
@@ -27,6 +29,8 @@ const props = withDefaults(
     resettable?: boolean;
     /** Defines interactivity */
     disabled?: boolean;
+    /** Defines if options list is loading */
+    loading?: boolean;
   }>(),
   {
     name: 'select',
@@ -50,10 +54,15 @@ defineSlots<{
   }): HTMLElement;
   /** Use to customize option list content */
   option(props: { option: SelectOption; selected: boolean }): HTMLElement;
+  /** Loading state customization */
+  loader(): HTMLElement;
+  /** Text for cases where there is no options */
+  noResultText(): HTMLElement;
 }>();
 
 const rootEl = ref<HTMLElement | null>(null);
 const select = ref<HTMLElement | null>(null);
+const virtualList = ref<VirtualScrollExpose | null>(null);
 
 const isOpen = ref<boolean>(false);
 const focusedIndex = ref<number | null>(null);
@@ -70,6 +79,7 @@ const selectedOptions = computed(() => props.options.filter((o) => valueSet.valu
 const chevronClasses = computed(
   () => `${$s['select__chevron']} ${isOpen.value ? $s['select__chevron--active'] : ''}`,
 );
+
 watch(
   () => props.options,
   (opts) => {
@@ -78,11 +88,18 @@ watch(
   { deep: true },
 );
 
+function scrollToFocused() {
+  if (virtualList.value && focusedIndex.value !== null) {
+    virtualList.value.scrollToIndex(focusedIndex.value);
+  }
+}
+
 function open() {
   if (isOpen.value) return;
   isOpen.value = true;
   const currentIndex = internalOptions.value.findIndex((o) => valueSet.value.has(o.value));
   focusedIndex.value = currentIndex !== -1 ? currentIndex : internalOptions.value.length ? 0 : null;
+  nextTick(() => scrollToFocused());
 }
 function close() {
   if (!isOpen.value) return;
@@ -106,6 +123,7 @@ function focusNext() {
   } else {
     focusedIndex.value = (focusedIndex.value + 1) % internalOptions.value.length;
   }
+  scrollToFocused();
 }
 
 function focusPrev() {
@@ -116,6 +134,7 @@ function focusPrev() {
     focusedIndex.value =
       (focusedIndex.value - 1 + internalOptions.value.length) % internalOptions.value.length;
   }
+  scrollToFocused();
 }
 
 function toggleOption(option: SelectOption) {
@@ -205,6 +224,7 @@ function onWrapperKeydown(e: KeyboardEvent) {
   });
 
   focusedIndex.value = 0;
+  scrollToFocused();
 
   if (resetTimer !== null) {
     clearTimeout(resetTimer);
@@ -243,67 +263,87 @@ onBeforeUnmount(() => {
       @focus="open"
       role="combobox"
       :aria-expanded="isOpen"
-      aria-haspopup="listbox"
-    >
+      aria-haspopup="listbox">
       <VIcon name="chevron" :class-name="chevronClasses" />
       <button
         v-if="resettable && valueSet.size"
         type="button"
         role="reset"
         :class="$s['select__reset']"
-        @click.stop="reset"
-      >
+        @click.stop="reset">
         <VIcon name="x" :class-name="$s['select__reset-icon']" />
       </button>
       <span :class="$s['select__label']">{{ label }}</span>
       <div :class="$s['select__chips']">
-        <slot
-          name="chip"
-          v-for="o in selectedOptions"
-          :option="o"
-          :removeFn="toggleOption"
-          :removable="multiple"
-        >
-          <VChip :removable="multiple" :key="o.value" @removed="toggleOption(o)">
-            {{ o.label }}
-          </VChip>
-        </slot>
+        <VirtualScroll :items="selectedOptions"
+          direction="horizontal"
+          :item-key="'select_chip'">
+          <template #default="{item}">
+            <slot
+              name="chip"
+              :option="item"
+              :removeFn="toggleOption"
+              :removable="multiple">
+              <VChip :removable="multiple" :key="item.value" @removed="toggleOption(item)">
+                {{ item.label }}
+              </VChip>
+            </slot>
+          </template>
+        </VirtualScroll>
       </div>
     </div>
     <div
-      :class="$s['select__options']"
+      :class="[
+        $s['select__options'],
+        loading ?  $s['select__options--loading'] : '',
+        ]"
       v-show="isOpen"
       role="listbox"
       :aria-hidden="!isOpen"
       tabindex="0"
-      @keydown="onWrapperKeydown"
-    >
-      <button
-        v-for="(o, idx) in internalOptions"
-        role="listitem"
-        :class="[$s['select__item'], idx === focusedIndex ? $s['select__item--focused'] : '']"
-        :key="o.value"
-        :aria-selected="valueSet.has(o.value)"
-        @mouseenter="onOptionMouseEnter(idx)"
-        @click="onOptionClick(o, idx)"
-      >
-        <slot name="option" :option="o" :selected="valueSet.has(o.value)">
-          <div :class="$s['select__item-content']">
-            <VIcon
-              v-if="multiple"
-              :name="valueSet.has(o.value) ? 'check' : 'square'"
-              :class-name="$s['select__item-icon']"
-            />
-            <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']" />
-            <span :class="$s['select__item-label']">
-              {{ o.label }}
-            </span>
-          </div>
-          <span v-if="o.notice" :class="$s['select__item-notice']">
-            {{ o.notice }}
-          </span>
+      @keydown="onWrapperKeydown">
+      <template v-if="loading">
+        <slot name="loader">
+          <VLoader :infinite="true"/>
         </slot>
-      </button>
+      </template>
+      <template v-else>
+        <template v-if="internalOptions.length">
+          <VirtualScroll ref="virtualList"
+            :items="internalOptions"
+            :item-key="'value'"
+            :class="$s['select__virtual-list']">
+            <template #default="{item: o, idx}">
+              <button
+                role="listitem"
+                :class="[$s['select__item'], idx === focusedIndex ? $s['select__item--focused'] : '']"
+                :key="o.value"
+                :aria-selected="valueSet.has(o.value)"
+                @mouseenter="onOptionMouseEnter(idx)"
+                @click="onOptionClick(o, idx)">
+                <slot name="option" :option="o" :selected="valueSet.has(o.value)">
+                  <div :class="$s['select__item-content']">
+                    <VIcon
+                      v-if="multiple"
+                      :name="valueSet.has(o.value) ? 'check' : 'square'"
+                      :class-name="$s['select__item-icon']"/>
+                    <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']" />
+                    <span :class="$s['select__item-label']">
+                      {{ o.label }}
+                    </span>
+                  </div>
+                  <span v-if="o.notice" :class="$s['select__item-notice']">
+                    {{ o.notice }}
+                  </span>
+                </slot>
+              </button>
+            </template>
+          </VirtualScroll>
+        </template>
+        <template v-else>
+          <slot name="noResultText"></slot>
+        </template>
+      </template>
     </div>
   </div>
 </template>
