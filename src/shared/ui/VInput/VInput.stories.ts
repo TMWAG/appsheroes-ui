@@ -4,6 +4,7 @@ import VInput from './VInput.vue';
 const meta = {
   component: VInput,
   title: 'Components/Input',
+  tags: ['autodocs'],
   render: (args) => ({
     components: { VInput },
     setup() {
