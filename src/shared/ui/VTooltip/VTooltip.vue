@@ -134,7 +134,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <span ref="triggerRef" :class="$s['tooltip__trigger']" tabindex="1" @mouseenter="show" @mouseleave="hide"
+  <span ref="triggerRef" :class="$s['tooltip__trigger']" @mouseenter="show" @mouseleave="hide"
     @focusin="show" @focusout="hide">
     <slot></slot>
   </span>
