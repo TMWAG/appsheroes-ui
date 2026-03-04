@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T">
 import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue';
 
 export interface VirtualScrollExpose {
@@ -109,9 +109,12 @@ const bottomSpacerSize = computed(() => {
   return Math.max(0, totalSize.value - topSpacerSize.value - renderedHeight);
 });
 
-const getKey = (item: T, index: number) => {
-  if (props.itemKey && props.itemKey in item) {
-    return item[props.itemKey];
+const getKey = (item: T, index: number): string | number => {
+  if (typeof props.itemKey === 'string' && item !== null && typeof item === 'object') {
+    const value = (item as Record<string, unknown>)[props.itemKey];
+    if (typeof value === 'string' || typeof value === 'number') {
+      return value;
+    }
   }
   return index;
 };
