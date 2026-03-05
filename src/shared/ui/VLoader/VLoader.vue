@@ -47,7 +47,7 @@ const props = withDefaults(defineProps<{
    */
   minDisplayTime?: number;
   ariaLabel?: string;
-
+  sm?: boolean,
 }>(), {
   progress: 0,
   infinite: false,
@@ -57,6 +57,7 @@ const props = withDefaults(defineProps<{
   delay: 0,
   minDisplayTime: 0,
   ariaLabel: 'loading',
+  sm: false,
 });
 
 const emits = defineEmits<{
@@ -101,7 +102,8 @@ defineExpose({
 
 <template>
   <div :class="[$s['loading-circle'],
-      overlay ? $s['loading-circle--with-overlay'] : '']">
+      overlay ? $s['loading-circle--with-overlay'] : '',
+      sm ? $s['loading-circle--sm'] : '' ]">
     <div v-if="overlay" :class="$s['loading-circle__overlay']" />
     <svg :class="[
         $s['loading-circle__svg'],

@@ -8,7 +8,10 @@
   justify-content: center;
   width: 52px;
   height: 52px;
-
+  &--sm {
+    width: 26px;
+    height: 26px;
+  }
   &__svg {
     rotate: -90deg;
     width: 52px;
