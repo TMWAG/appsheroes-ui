@@ -2,6 +2,8 @@
 import type { RouteLocationAsStringTyped } from 'vue-router';
 import $s from './VButton.module.scss';
 import { VIcon, type IconNames } from '@/shared/ui/VIcon';
+import { VLoader } from '@/shared/ui/VLoader';
+import { computed } from 'vue';
 
 type ButtonVariants = 'primary' | 'secondary' | 'tertiary' | 'negative';
 
@@ -19,10 +21,13 @@ const props = withDefaults(
     iconRight?: IconNames;
     /** Optional link to router location */
     href?: RouteLocationAsStringTyped;
+    /** Defines loading state */
+    isLoading?: boolean,
   }>(),
   {
     variant: 'primary',
     disabled: false,
+    isLoading: false,
   },
 );
 
@@ -31,19 +36,30 @@ defineSlots<{
   default?: string;
 }>();
 
-const tag = props.href ? (props.disabled ? 'span' : 'RouterLink') : 'button';
+const tag = computed(() =>
+  props.href || props.isLoading
+  ? (
+    props.disabled || props.isLoading
+    ? 'span'
+    : 'RouterLink'
+  )
+  : 'button'
+);
 
 const getVariantClass = (): string | undefined =>
-  $s[`btn_${props.variant}${tag === 'span' ? '-disabled' : ''}`];
+  $s[`btn_${props.variant}${tag.value === 'span' ? '-disabled' : ''}`];
 </script>
 
 <template>
-  <component :is="tag" :to="href" :class="[$s.btn, getVariantClass()]" :disabled="disabled">
+  <component :is="tag" :to="href" :class="[$s.btn, getVariantClass()]" :disabled="disabled || isLoading">
     <VIcon v-if="iconLeft" :name="iconLeft" :class-name="$s.btn__icon" />
-    <VIcon v-if="icon" :name="icon" :class-name="$s.btn__icon" />
-    <span v-else>
-      <slot />
-    </span>
+    <VLoader v-if="isLoading" infinite sm aria-label="loading"/>
+    <template v-else>
+      <VIcon v-if="icon" :name="icon" :class-name="$s.btn__icon" />
+      <span v-else>
+        <slot />
+      </span>
+    </template>
     <VIcon v-if="iconRight" :name="iconRight" :class-name="$s.btn__icon" />
   </component>
 </template>
