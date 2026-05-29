@@ -5,6 +5,9 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue({ features: { customElement: true }})],
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production'),
+  },
   publicDir: false,
   resolve: {
     alias: {
