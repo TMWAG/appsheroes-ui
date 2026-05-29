@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
+  publicDir: false,
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -12,22 +13,13 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      entry: fileURLToPath(new URL('./src/index.ce.ts', import.meta.url)),
       name: 'AppsheroesUi',
-      formats: ['es', 'cjs'],
-      fileName: (format) => format === 'es' ? 'index.mjs' : 'index.cjs',
+      formats: ['iife'],
+      fileName: () => 'appsheroes-ui.js',
       cssFileName: 'style',
     },
-    rollupOptions: {
-      external: ['vue', 'vue-router'],
-      output: {
-        globals: {
-          vue: 'Vue',
-          'vue-router': 'VueRouter',
-        },
-      },
-    },
     cssCodeSplit: false,
-    outDir: 'dist',
+    outDir: 'dist/web',
   },
 })

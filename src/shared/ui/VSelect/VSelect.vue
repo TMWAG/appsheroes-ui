@@ -3,9 +3,9 @@ import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue'
 import { VChip } from '../VChip';
 import { VIcon } from '../VIcon';
 import $s from './VSelect.module.scss';
-import { VLoader } from '@/shared/ui/VLoader';
-import { VirtualScroll, type VirtualScrollExpose } from '@/shared/ui/VirtualScroll';
-import { Dropdown } from 'floating-vue'
+import { VLoader } from '../VLoader';
+import { VirtualScroll, type VirtualScrollExpose } from '../VirtualScroll';
+import { useFloatingPosition } from '../../lib/hooks';
 
 export type SelectOption<T = string> = {
   value: T;
@@ -56,11 +56,20 @@ const slots = defineSlots<{
 
 const rootEl = ref<HTMLElement | null>(null);
 const triggerEl = ref<HTMLElement | null>(null);
+const dropdownRef = ref<HTMLElement | null>(null);
 const virtualList = ref<VirtualScrollExpose | null>(null);
 
 const isOpen = ref<boolean>(false);
 const focusedIndex = ref<number>(-1);
 const searchQuery = ref<string>('');
+
+const { style: dropdownStyle, updatePosition } = useFloatingPosition({
+  triggerRef: triggerEl,
+  floatingRef: dropdownRef,
+  placement: 'bottom',
+  gap: 4,
+  padding: 8,
+});
 
 let resetTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -117,6 +126,7 @@ function open() {
 
   nextTick(() => {
     scrollToFocused();
+    updatePosition();
   });
 }
 
@@ -286,87 +296,82 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Dropdown>
-    <div :class="$s['select']" ref="rootEl">
-      <div :class="[
-        $s['select__wrapper'],
-        disabled ? $s['select__wrapper--disabled'] : '',
-        isOpen ? $s['select__wrapper--active'] : ''
-      ]" :tabindex="disabled ? -1 : 0" ref="triggerEl" @keydown="onWrapperKeydown" @click="toggleOpen" role="combobox"
-        :aria-expanded="isOpen" aria-haspopup="listbox"
-        :aria-activedescendant="isOpen && focusedIndex > -1 ? `option-${focusedIndex}` : undefined" :aria-label="label">
+  <div :class="$s['select']" ref="rootEl">
+    <div :class="[
+      $s['select__wrapper'],
+      disabled ? $s['select__wrapper--disabled'] : '',
+      isOpen ? $s['select__wrapper--active'] : ''
+    ]" :tabindex="disabled ? -1 : 0" ref="triggerEl" @keydown="onWrapperKeydown" @click="toggleOpen" role="combobox"
+      :aria-expanded="isOpen" aria-haspopup="listbox"
+      :aria-activedescendant="isOpen && focusedIndex > -1 ? `option-${focusedIndex}` : undefined" :aria-label="label">
 
-        <VIcon name="chevron" :class-name="chevronClasses" />
+      <VIcon name="chevron" :class-name="chevronClasses" />
 
-        <button v-if="resettable && valueSet.size" type="button" tabindex="-1" :class="$s['select__reset']"
-          @click.stop="reset" aria-label="Reset selection">
-          <VIcon name="x" :class-name="$s['select__reset-icon']" />
-        </button>
+      <button v-if="resettable && valueSet.size" type="button" tabindex="-1" :class="$s['select__reset']"
+        @click.stop="reset" aria-label="Reset selection">
+        <VIcon name="x" :class-name="$s['select__reset-icon']" />
+      </button>
 
-        <span :class="$s['select__label']">{{ label }}</span>
+      <span :class="$s['select__label']">{{ label }}</span>
 
-        <div :class="$s['select__chips']">
-          <VirtualScroll v-if="selectedOptions.length" :items="selectedOptions" direction="horizontal" item-key="value">
-            <template #default="{ item }">
-              <slot name="chip" :option="item" :removeFn="toggleOption" :removable="multiple">
-                <VChip :removable="multiple" :key="item.value" @removed="toggleOption(item)">
-                  {{ item.label }}
-                </VChip>
-              </slot>
+      <div :class="$s['select__chips']">
+        <VirtualScroll v-if="selectedOptions.length" :items="selectedOptions" direction="horizontal" item-key="value">
+          <template #default="{ item }">
+            <slot name="chip" :option="item" :removeFn="toggleOption" :removable="multiple">
+              <VChip :removable="multiple" :key="item.value" @removed="toggleOption(item)">
+                {{ item.label }}
+              </VChip>
+            </slot>
+          </template>
+        </VirtualScroll>
+      </div>
+    </div>
+
+    <div ref="dropdownRef" :class="[
+      $s['select__options'],
+      loading ? $s['select__options--loading'] : '',
+    ]" v-show="isOpen" role="listbox" :style="dropdownStyle" :aria-hidden="!isOpen" tabindex="-1">
+
+      <template v-if="loading">
+        <slot name="loader">
+          <VLoader :infinite="true" />
+        </slot>
+      </template>
+
+      <template v-else>
+        <template v-if="filteredOptions.length">
+          <VirtualScroll ref="virtualList" :items="filteredOptions" item-key="value"
+            :class="$s['select__virtual-list']">
+            <template #default="{ item: o, idx }">
+              <button :id="`option-${idx}`" role="option" :class="[
+                $s['select__item'],
+                idx === focusedIndex ? $s['select__item--focused'] : '',
+                o.disabled ? $s['select__item--disabled'] : ''
+              ]" :key="o.value" :aria-selected="valueSet.has(o.value)" :disabled="o.disabled"
+                @mouseenter="onOptionMouseEnter(idx)" @click="onOptionClick(o, idx)">
+                <slot name="option" :option="o" :selected="valueSet.has(o.value)">
+                  <div :class="$s['select__item-content']">
+                    <VIcon v-if="multiple" :name="valueSet.has(o.value) ? 'check' : 'square'"
+                      :class-name="$s['select__item-icon']" />
+                    <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']" />
+                    <span :class="$s['select__item-label']">
+                      {{ o.label }}
+                    </span>
+                  </div>
+                  <span v-if="o.notice" :class="$s['select__item-notice']">
+                    {{ o.notice }}
+                  </span>
+                </slot>
+              </button>
             </template>
           </VirtualScroll>
-        </div>
-      </div>
-
-      <!-- Dropdown -->
-    </div>
-    <template #popper>
-      <div :class="[
-        $s['select__options'],
-        loading ? $s['select__options--loading'] : '',
-      ]" v-show="isOpen" role="listbox" :aria-hidden="!isOpen" tabindex="-1">
-
-        <template v-if="loading">
-          <slot name="loader">
-            <VLoader :infinite="true" />
-          </slot>
         </template>
-
         <template v-else>
-          <template v-if="filteredOptions.length">
-            <VirtualScroll ref="virtualList" :items="filteredOptions" item-key="value"
-              :class="$s['select__virtual-list']">
-              <template #default="{ item: o, idx }">
-                <button :id="`option-${idx}`" role="option" :class="[
-                  $s['select__item'],
-                  idx === focusedIndex ? $s['select__item--focused'] : '',
-                  o.disabled ? $s['select__item--disabled'] : ''
-                ]" :key="o.value" :aria-selected="valueSet.has(o.value)" :disabled="o.disabled"
-                  @mouseenter="onOptionMouseEnter(idx)" @click="onOptionClick(o, idx)">
-                  <slot name="option" :option="o" :selected="valueSet.has(o.value)">
-                    <div :class="$s['select__item-content']">
-                      <VIcon v-if="multiple" :name="valueSet.has(o.value) ? 'check' : 'square'"
-                        :class-name="$s['select__item-icon']" />
-                      <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']" />
-                      <span :class="$s['select__item-label']">
-                        {{ o.label }}
-                      </span>
-                    </div>
-                    <span v-if="o.notice" :class="$s['select__item-notice']">
-                      {{ o.notice }}
-                    </span>
-                  </slot>
-                </button>
-              </template>
-            </VirtualScroll>
-          </template>
-          <template v-else>
-            <div :class="$s['select__no-result']">
-              <slot name="noResultText">No options found</slot>
-            </div>
-          </template>
+          <div :class="$s['select__no-result']">
+            <slot name="noResultText">No options found</slot>
+          </div>
         </template>
-      </div>
-    </template>
-  </Dropdown>
+      </template>
+    </div>
+  </div>
 </template>

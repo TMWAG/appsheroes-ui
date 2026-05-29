@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import $s from './VInput.module.scss';
-import VIcon from '../VIcon/VIcon.vue';
-import { vTooltip } from 'floating-vue';
+import { VIcon } from '../VIcon';
+import { VTooltip } from '../VTooltip';
 
 const props = withDefaults(
   defineProps<{
@@ -60,14 +60,14 @@ const inputId = generateId(props.name);
       </label>
     </div>
     <div :class="$s.input__footer" ref="subtitlesBlock">
-      <span v-show="caption"
-        :class="$s.input__caption"
-        v-tooltip.bottom="{ content: caption, shown: true }">
-        {{ caption }}
-      </span>
-      <span v-if="error" :class="$s.input__error" v-tooltip.bottom="error">
-        {{ error }}
-      </span>
+      <VTooltip v-if="caption" placement="bottom" persistent>
+        <span :class="$s.input__caption">{{ caption }}</span>
+        <template #content>{{ caption }}</template>
+      </VTooltip>
+      <VTooltip v-if="error" placement="bottom">
+        <span :class="$s.input__error">{{ error }}</span>
+        <template #content>{{ error }}</template>
+      </VTooltip>
     </div>
   </div>
 </template>

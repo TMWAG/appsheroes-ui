@@ -1,5 +1,31 @@
-import { createApp } from '@/app';
+export {
+  VButton,
+  VInput,
+  VIcon,
+  VChip,
+  VTooltip,
+  VSelect,
+  VLoader,
+  VirtualScroll,
+  VModal,
+} from './shared/ui';
 
-const { app, router } = createApp();
-await router.isReady();
-app.mount('#app');
+export type {
+  SelectOption,
+  Status,
+  VModalExpose,
+  VirtualScrollExpose,
+  IconNames,
+} from './shared/ui';
+
+export {
+  useVLoader,
+  useMouseTracker,
+  useFloatingPosition,
+} from './shared/lib/hooks';
+
+export type {
+  UseVLoaderOptions,
+  UseFloatingPositionOptions,
+  UseFloatingPositionReturn,
+} from './shared/lib/hooks';

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { RouteLocationAsStringTyped } from 'vue-router';
 import $s from './VButton.module.scss';
-import { VIcon, type IconNames } from '@/shared/ui/VIcon';
-import { VLoader } from '@/shared/ui/VLoader';
-import { computed } from 'vue';
+import { VIcon, type IconNames } from '../VIcon';
+import { VLoader } from '../VLoader';
+import { computed, getCurrentInstance } from 'vue';
 
 type ButtonVariants = 'primary' | 'secondary' | 'tertiary' | 'negative';
 
@@ -19,8 +18,8 @@ const props = withDefaults(
     iconLeft?: IconNames;
     /** Icon on the right */
     iconRight?: IconNames;
-    /** Optional link to router location */
-    href?: RouteLocationAsStringTyped;
+    /** Optional link to router location or href */
+    href?: string;
     /** Defines loading state */
     isLoading?: boolean,
   }>(),
@@ -36,14 +35,24 @@ defineSlots<{
   default?: string;
 }>();
 
+function hasRouterLink(): boolean {
+  try {
+    const instance = getCurrentInstance();
+    if (!instance) return false;
+    return !!instance.appContext.config.globalProperties.$router;
+  } catch {
+    return false;
+  }
+}
+
 const tag = computed(() =>
-  props.href || props.isLoading
-  ? (
-    props.disabled || props.isLoading
-    ? 'span'
-    : 'RouterLink'
-  )
-  : 'button'
+  props.href && !props.disabled && !props.isLoading
+    ? hasRouterLink()
+      ? 'RouterLink'
+      : 'a'
+    : props.href
+      ? 'span'
+      : 'button'
 );
 
 const getVariantClass = (): string | undefined =>
@@ -52,7 +61,8 @@ const getVariantClass = (): string | undefined =>
 
 <template>
   <component :is="tag"
-    :to="href"
+    :to="tag === 'RouterLink' ? href : undefined"
+    :href="tag === 'a' ? href : undefined"
     :class="[$s.btn, getVariantClass()]"
     :tabindex="tag === 'button' ? 1 : 0"
     :disabled="disabled || isLoading">
