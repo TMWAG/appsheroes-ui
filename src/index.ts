@@ -1,3 +1,5 @@
+import '@/shared/styles/index.scss';
+
 export {
   VButton,
   VInput,
