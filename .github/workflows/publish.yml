@@ -18,7 +18,13 @@ jobs:
           node-version: 22
           registry-url: 'https://npm.pkg.github.com'
       - run: npm ci
-      - run: npm version ${GITHUB_REF#refs/tags/v} --no-git-tag-version
+      - run: |
+          EXPECTED="${GITHUB_REF#refs/tags/v}"
+          ACTUAL=$(node -p "require('./package.json').version")
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "Tag v$EXPECTED doesn't match package.json version $ACTUAL"
+            exit 1
+          fi
       - run: npm run build
       - run: npm publish
         env:
