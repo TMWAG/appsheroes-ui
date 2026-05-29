@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.2.1",
+    "floating-vue": "^5.2.2",
     "pinia": "^3.0.3",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
@@ -58,7 +59,7 @@
     "sass": "^1.94.0",
     "steiger": "^0.5.11",
     "storybook": "^10.2.12",
-    "typescript": "~5.9.0",
+    "typescript": "^5.9.3",
     "vite": "^7.1.11",
     "vite-plugin-vue-devtools": "^8.0.3",
     "vitest": "^4.0.18",

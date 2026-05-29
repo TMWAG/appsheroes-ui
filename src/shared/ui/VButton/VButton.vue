@@ -51,7 +51,11 @@ const getVariantClass = (): string | undefined =>
 </script>
 
 <template>
-  <component :is="tag" :to="href" :class="[$s.btn, getVariantClass()]" :disabled="disabled || isLoading">
+  <component :is="tag"
+    :to="href"
+    :class="[$s.btn, getVariantClass()]"
+    :tabindex="tag === 'button' ? 1 : 0"
+    :disabled="disabled || isLoading">
     <VIcon v-if="iconLeft" :name="iconLeft" :class-name="$s.btn__icon" />
     <VLoader v-if="isLoading" infinite sm aria-label="loading"/>
     <template v-else>
