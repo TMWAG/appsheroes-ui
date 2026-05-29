@@ -1,10 +1,14 @@
 {
-  "name": "@5element/appsheroes-ui",
+  "name": "@TMWAG/appsheroes-ui",
   "version": "0.1.0",
   "type": "module",
   "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:TMWAG/appsheroes-ui.git"
+  },
   "publishConfig": {
-    "@5element:registry": "https://gitlab.h1m1.space/api/v4/packages/npm/"
+    "@TMWAG:registry": "https://npm.pkg.github.com"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
