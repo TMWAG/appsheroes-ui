@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue';
-import $s from './VTooltip.module.scss';
 import { useFloatingPosition } from '../../lib/hooks';
 
 defineOptions({ inheritAttrs: false });
@@ -58,16 +57,70 @@ onMounted(() => {
 </script>
 
 <template>
-  <span ref="triggerRef" :class="$s['tooltip__trigger']" @mouseenter="show" @mouseleave="hide"
+  <span ref="triggerRef" class="tooltip__trigger" @mouseenter="show" @mouseleave="hide"
     @focusin="show" @focusout="hide">
     <slot></slot>
   </span>
-  <transition :enter-from-class="$s['enter-from']" :enter-active-class="$s['enter-active']"
-    :enter-to-class="$s['enter-to']" :leave-from-class="$s['leave-from']" :leave-active-class="$s['leave-active']"
-    :leave-to-class="$s['leave-to']">
-    <div v-if="open" ref="tooltipRef" role="tooltip" :class="[$s.tooltip, $s[`dir-${actualPlacement}`], $attrs.class]"
+  <transition :enter-from-class="'enter-from'" :enter-active-class="'enter-active'"
+    :enter-to-class="'enter-to'" :leave-from-class="'leave-from'" :leave-active-class="'leave-active'"
+    :leave-to-class="'leave-to'">
+    <div v-if="open" ref="tooltipRef" role="tooltip" :class="['tooltip', `dir-${actualPlacement}`, $attrs.class]"
       :style="style">
       <slot name="content"></slot>
     </div>
   </transition>
 </template>
+
+<style scoped lang="scss">
+@use '../../styles/mixins' as *;
+
+.tooltip {
+  @include text(s);
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  max-width: 25vw;
+  width: max-content;
+  pointer-events: none;
+  display: inline-flex;
+  flex-grow: 1;
+}
+
+.enter-from,
+.leave-to {
+  opacity: 0;
+}
+
+.enter-to,
+.leave-from {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.enter-active,
+.leave-active {
+  transition: opacity 300ms ease, transform 300ms ease;
+  will-change: opacity, transform;
+}
+
+.dir-top.enter-from,
+.dir-top.leave-to {
+  transform: translateY(6px);
+}
+
+.dir-bottom.enter-from,
+.dir-bottom.leave-to {
+  transform: translateY(-6px);
+}
+
+.dir-left.enter-from,
+.dir-left.leave-to {
+  transform: translateX(6px);
+}
+
+.dir-right.enter-from,
+.dir-right.leave-to {
+  transform: translateX(-6px);
+}
+</style>

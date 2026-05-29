@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { VChip } from '../VChip';
 import { VIcon } from '../VIcon';
-import $s from './VSelect.module.scss';
 import { VLoader } from '../VLoader';
 import { VirtualScroll, type VirtualScrollExpose } from '../VirtualScroll';
 import { useFloatingPosition } from '../../lib/hooks';
@@ -43,7 +42,7 @@ const emits = defineEmits<{
   close: [];
 }>();
 
-const slots = defineSlots<{
+defineSlots<{
   chip(props: {
     option: SelectOption<T>;
     removeFn: (o: SelectOption<T>) => void;
@@ -85,7 +84,7 @@ const selectedOptions = computed(() =>
 );
 
 const chevronClasses = computed(
-  () => `${$s['select__chevron']} ${isOpen.value ? $s['select__chevron--active'] : ''}`,
+  () => `select__chevron ${isOpen.value ? 'select__chevron--active' : ''}`,
 );
 
 const filteredOptions = computed(() => {
@@ -296,25 +295,25 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :class="$s['select']" ref="rootEl">
+  <div class="select" ref="rootEl">
     <div :class="[
-      $s['select__wrapper'],
-      disabled ? $s['select__wrapper--disabled'] : '',
-      isOpen ? $s['select__wrapper--active'] : ''
+      'select__wrapper',
+      disabled ? 'select__wrapper--disabled' : '',
+      isOpen ? 'select__wrapper--active' : ''
     ]" :tabindex="disabled ? -1 : 0" ref="triggerEl" @keydown="onWrapperKeydown" @click="toggleOpen" role="combobox"
       :aria-expanded="isOpen" aria-haspopup="listbox"
       :aria-activedescendant="isOpen && focusedIndex > -1 ? `option-${focusedIndex}` : undefined" :aria-label="label">
 
       <VIcon name="chevron" :class-name="chevronClasses" />
 
-      <button v-if="resettable && valueSet.size" type="button" tabindex="-1" :class="$s['select__reset']"
+      <button v-if="resettable && valueSet.size" type="button" tabindex="-1" class="select__reset"
         @click.stop="reset" aria-label="Reset selection">
-        <VIcon name="x" :class-name="$s['select__reset-icon']" />
+        <VIcon name="x" class-name="select__reset-icon" />
       </button>
 
-      <span :class="$s['select__label']">{{ label }}</span>
+      <span class="select__label">{{ label }}</span>
 
-      <div :class="$s['select__chips']">
+      <div class="select__chips">
         <VirtualScroll v-if="selectedOptions.length" :items="selectedOptions" direction="horizontal" item-key="value">
           <template #default="{ item }">
             <slot name="chip" :option="item" :removeFn="toggleOption" :removable="multiple">
@@ -328,8 +327,8 @@ onBeforeUnmount(() => {
     </div>
 
     <div ref="dropdownRef" :class="[
-      $s['select__options'],
-      loading ? $s['select__options--loading'] : '',
+      'select__options',
+      loading ? 'select__options--loading' : '',
     ]" v-show="isOpen" role="listbox" :style="dropdownStyle" :aria-hidden="!isOpen" tabindex="-1">
 
       <template v-if="loading">
@@ -341,24 +340,24 @@ onBeforeUnmount(() => {
       <template v-else>
         <template v-if="filteredOptions.length">
           <VirtualScroll ref="virtualList" :items="filteredOptions" item-key="value"
-            :class="$s['select__virtual-list']">
+            class="select__virtual-list">
             <template #default="{ item: o, idx }">
               <button :id="`option-${idx}`" role="option" :class="[
-                $s['select__item'],
-                idx === focusedIndex ? $s['select__item--focused'] : '',
-                o.disabled ? $s['select__item--disabled'] : ''
+                'select__item',
+                idx === focusedIndex ? 'select__item--focused' : '',
+                o.disabled ? 'select__item--disabled' : ''
               ]" :key="o.value" :aria-selected="valueSet.has(o.value)" :disabled="o.disabled"
                 @mouseenter="onOptionMouseEnter(idx)" @click="onOptionClick(o, idx)">
                 <slot name="option" :option="o" :selected="valueSet.has(o.value)">
-                  <div :class="$s['select__item-content']">
+                  <div class="select__item-content">
                     <VIcon v-if="multiple" :name="valueSet.has(o.value) ? 'check' : 'square'"
-                      :class-name="$s['select__item-icon']" />
-                    <img v-if="o.image" :src="o.image" :alt="o.label" :class="$s['select__item-image']" />
-                    <span :class="$s['select__item-label']">
+                      class-name="select__item-icon" />
+                    <img v-if="o.image" :src="o.image" :alt="o.label" class="select__item-image" />
+                    <span class="select__item-label">
                       {{ o.label }}
                     </span>
                   </div>
-                  <span v-if="o.notice" :class="$s['select__item-notice']">
+                  <span v-if="o.notice" class="select__item-notice">
                     {{ o.notice }}
                   </span>
                 </slot>
@@ -367,7 +366,7 @@ onBeforeUnmount(() => {
           </VirtualScroll>
         </template>
         <template v-else>
-          <div :class="$s['select__no-result']">
+          <div class="select__no-result">
             <slot name="noResultText">No options found</slot>
           </div>
         </template>
@@ -375,3 +374,157 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+@use '../../styles/mixins' as *;
+
+.select {
+  position: relative;
+  &__wrapper {
+    position: relative;
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
+    width: 100%;
+    height: 40px;
+    padding: 16px 32px 8px 8px;
+    background-color: var(--bg-primary);
+    outline: none;
+    transition: opacity ease-in 150ms;
+    &:hover {
+      border-color: var(--border-hover);
+      & > .select__reset {
+        opacity: 100;
+      }
+    }
+    &:focus,
+    &:focus-within {
+      border-color: var(--border-active);
+      & > .select__reset {
+        opacity: 100;
+      }
+    }
+    &:focus > .select__label,
+    &:focus-within > .select__label,
+    &.select__wrapper:has([role='note']) > .select__label {
+      @include text(xs);
+      top: 4px;
+      color: var(--text-primary);
+    }
+    &--disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+  }
+  &__chevron {
+    position: absolute;
+    background-color: var(--bg-primary);
+    right: 8px;
+    top: calc(50% - 4px);
+    transition: rotate 200ms;
+    height: 12px;
+    width: 12px;
+    fill: var(--graphic-primary);
+    rotate: 0deg;
+    &--active {
+      rotate: -180deg;
+    }
+  }
+  &__reset {
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    position: absolute;
+    right: 1.75rem;
+    top: 12px;
+    background-color: var(--bg-secondary);
+    transition: all 150ms;
+    border: none;
+    height: 1rem;
+    width: 1rem;
+    border-radius: 9999px;
+    padding: 0.2rem;
+    cursor: pointer;
+    &:hover {
+      background-color: var(--bg-disable);
+    }
+  }
+  &__chips {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overflow-y: hidden;
+    width: calc(100% - 16px);
+    @include text(m);
+  }
+  &__label {
+    @include text(m);
+    color: var(--text-secondary);
+    top: 12px;
+    left: 8px;
+    position: absolute;
+    transition: all 150ms;
+  }
+  &__options {
+    outline: none;
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    background-color: var(--bg-primary);
+    width: 100%;
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    max-height: 400px;
+    overflow-y: auto;
+    &--loading {
+      padding: 4px;
+      align-items: center;
+      overflow-y: hidden;
+    }
+  }
+  &__item {
+    @include text(m);
+    background-color: var(--bg-primary);
+    border: none;
+    transition: background-color 150ms;
+    padding: 8px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    &:first-of-type {
+      border-radius: 3px 3px 0 0;
+    }
+    &:last-of-type {
+      border-radius: 0 0 3px 3px;
+    }
+    &--focused,
+    &:hover {
+      background-color: var(--bg-secondary);
+    }
+    &-content {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    &-label {
+      color: var(--text-primary);
+    }
+    &-notice {
+      color: var(--text-secondary);
+    }
+    &-icon {
+      height: 15px;
+      width: 15px;
+      fill: var(--graphic-primary);
+    }
+    &-image {
+      height: 20px;
+      width: 20px;
+      border-radius: 2px;
+    }
+  }
+}
+</style>

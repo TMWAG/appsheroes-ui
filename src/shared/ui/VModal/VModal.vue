@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import $s from './VModal.module.scss';
+
 
 export interface VModalExpose {
   show(): void;
@@ -108,11 +108,55 @@ onMounted(() => {
     :id="id"
     @click="handleModalClick"
     :class="[
-      $s['modal'],
-      isModalBeingClosed ? $s['modal--hide'] : '',
+      'modal',
+      isModalBeingClosed ? 'modal--hide' : '',
     ]">
     <slot :close="hide">
 
     </slot>
   </dialog>
 </template>
+
+<style scoped lang="scss">
+@use '../../styles/mixins' as *;
+
+.modal {
+  border: 2px solid var(--border-disable);
+  border-radius: 8px;
+  padding: 8px;
+  position: relative;
+  &::backdrop {
+    background-color: var(--bg-disable);
+    opacity: 0.6;
+  }
+  &__close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+  }
+  &[open] {
+    animation: show 200ms;
+  }
+  &--hide {
+    animation: hide 200ms;
+  }
+}
+
+@keyframes show {
+  from {
+    opacity: 0;
+    scale: 0.65;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes hide {
+  to {
+    opacity: 0;
+    scale: 0.65;
+  }
+}
+</style>
