@@ -192,6 +192,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
+@use '../../styles/reset';
 .wrapper {
   overflow: auto;
   height: 200px;

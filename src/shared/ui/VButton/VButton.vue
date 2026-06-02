@@ -79,6 +79,7 @@ const getVariantClass = (): string | undefined =>
 
 <style scoped lang="scss">
 @use '../../styles/mixins' as *;
+@use '../../styles/reset';
 
 .btn {
   @include text(m);

@@ -147,6 +147,7 @@ defineExpose({
 
 <style scoped lang="scss">
 @use '../../styles/mixins' as *;
+@use '../../styles/reset';
 
 .loading-circle {
   position: relative;

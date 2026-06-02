@@ -73,6 +73,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @use '../../styles/mixins' as *;
+@use '../../styles/reset';
 
 .tooltip {
   @include text(s);

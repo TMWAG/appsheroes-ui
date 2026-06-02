@@ -73,6 +73,7 @@ const inputId = generateId(props.name);
 
 <style scoped lang="scss">
 @use '../../styles/mixins' as *;
+@use '../../styles/reset';
 
 .input {
   display: flex;
