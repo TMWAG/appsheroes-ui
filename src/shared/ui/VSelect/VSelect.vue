@@ -377,6 +377,7 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '../../styles/mixins' as *;
+@use '../../styles/reset';
 
 .select {
   position: relative;

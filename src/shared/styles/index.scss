@@ -1,8 +1,5 @@
 @use 'mixins' as *;
 @use 'fonts';
+@use 'reset';
 
 @include themes;
-
-* {
-  box-sizing: border-box;
-}

@@ -119,6 +119,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @use '../../styles/mixins' as *;
+@use '../../styles/reset';
 
 .modal {
   border: 2px solid var(--border-disable);

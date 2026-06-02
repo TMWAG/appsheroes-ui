@@ -66,6 +66,7 @@ function getVariantClass(): string | undefined {
 
 <style scoped lang="scss">
 @use '../../styles/mixins' as *;
+@use '../../styles/reset';
 
 .chip {
   @include text(s);
