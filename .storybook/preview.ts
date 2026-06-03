@@ -1,7 +1,13 @@
 import type { Preview } from '@storybook/vue3-vite';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import type { App } from 'vue';
 
 import '@/shared/styles/index.scss';
+
+export const setup = (app: App) => {
+  app.config.compilerOptions.isCustomElement = (tag: string) =>
+    tag.startsWith('v-');
+};
 
 const preview: Preview = {
   decorators: [
