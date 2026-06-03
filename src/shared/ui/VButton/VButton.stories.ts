@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import VButton from './VButton.vue';
+import { vButtonVariants } from './VButton.story-args';
 
 const meta = {
   component: VButton,
-  title: 'Components/Button',
+  title: 'Vue/Button',
   tags: ['autodocs'],
   render: (args) => ({
     components: { VButton },
@@ -18,87 +19,15 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
-  args: {
-    variant: 'primary',
-    default: 'Button',
-  },
-};
-
-export const PrimaryDisable: Story = {
-  args: {
-    ...Primary.args,
-    disabled: true,
-  },
-};
-
-export const Secondary: Story = {
-  args: {
-    variant: 'secondary',
-    default: 'Button',
-  },
-};
-
-export const SecondaryDisable: Story = {
-  args: {
-    ...Secondary.args,
-    disabled: true,
-  },
-};
-
-export const Tertiary: Story = {
-  args: {
-    variant: 'tertiary',
-    default: 'Button',
-  },
-};
-
-export const TertiaryDisable: Story = {
-  args: {
-    ...Tertiary.args,
-    disabled: true,
-  },
-};
-
-export const Negative: Story = {
-  args: {
-    variant: 'negative',
-    default: 'Button',
-  },
-};
-
-export const NegativeDisable: Story = {
-  args: {
-    ...Negative.args,
-    disabled: true,
-  },
-};
-
-export const IconOnly: Story = {
-  args: {
-    variant: 'primary',
-    icon: 'plus',
-  },
-};
-
-export const IconLeft: Story = {
-  args: {
-    ...Primary.args,
-    iconLeft: 'plus',
-  },
-};
-
-export const IconRight: Story = {
-  args: {
-    ...Primary.args,
-    iconRight: 'plus',
-  },
-};
-
-export const BothIcons: Story = {
-  args: {
-    ...Primary.args,
-    iconLeft: 'plus',
-    iconRight: 'plus',
-  },
-};
+export const Primary: Story = { args: vButtonVariants.Primary };
+export const PrimaryDisable: Story = { args: vButtonVariants.PrimaryDisable };
+export const Secondary: Story = { args: vButtonVariants.Secondary };
+export const SecondaryDisable: Story = { args: vButtonVariants.SecondaryDisable };
+export const Tertiary: Story = { args: vButtonVariants.Tertiary };
+export const TertiaryDisable: Story = { args: vButtonVariants.TertiaryDisable };
+export const Negative: Story = { args: vButtonVariants.Negative };
+export const NegativeDisable: Story = { args: vButtonVariants.NegativeDisable };
+export const IconOnly: Story = { args: vButtonVariants.IconOnly };
+export const IconLeft: Story = { args: vButtonVariants.IconLeft };
+export const IconRight: Story = { args: vButtonVariants.IconRight };
+export const BothIcons: Story = { args: vButtonVariants.BothIcons };
