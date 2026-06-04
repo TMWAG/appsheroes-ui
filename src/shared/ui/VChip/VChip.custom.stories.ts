@@ -1,24 +1,30 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import VChip from './VChip.vue';
-import { vChipVariants } from './VChip.story-args.ts';
-import { iconNames } from '@/shared/ui/VIcon/supportedIconMap.ts';
+import { computed } from 'vue';
+import { mapArgsToAttrs } from '@/shared/ui/helpers/storybook-ce';
+import { vChipVariants } from './VChip.story-args';
+import { iconNames } from '@/shared/ui/VIcon/supportedIconMap';
 
 const meta = {
-  component: VChip,
-  title: 'Vue/Chip',
+  title: 'Custom Elements/Chip',
   tags: ['autodocs'],
   argTypes: {
+    variant: {
+      control: 'select',
+      options: ['default', 'accent', 'negative', 'info', 'positive'],
+    },
+    removable: { control: 'boolean' },
     iconLeft: { control: 'select', options: iconNames },
     iconRight: { control: 'select', options: iconNames },
+    default: { control: 'text' },
   },
   render: (args) => ({
-    components: { VChip },
     setup() {
-      return { args };
+      const attrs = computed(() => mapArgsToAttrs(args));
+      return { args, attrs };
     },
-    template: '<VChip v-bind="args">{{args.default}}</VChip>',
+    template: '<v-chip v-bind="attrs">{{ args.default }}</v-chip>',
   }),
-} satisfies Meta<typeof VChip>;
+} satisfies Meta;
 
 export default meta;
 
