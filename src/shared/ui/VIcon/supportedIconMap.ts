@@ -25,4 +25,6 @@ export const supportedIconMap = {
   check: 'check-square',
 } as const;
 
+export const iconNames = Object.keys(supportedIconMap);
+
 export type IconNames = keyof typeof supportedIconMap;
