@@ -1,19 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import VInput from './VInput.vue';
-import vInputVariants from './VInput.story-args.ts';
+import { computed } from 'vue';
+import { mapArgsToAttrs } from '@/shared/ui/helpers/storybook-ce';
+import vInputVariants from './VInput.story-args';
 
 const meta = {
-  component: VInput,
-  title: 'Vue/Input',
+  title: 'Custom Elements/Input',
   tags: ['autodocs'],
   render: (args) => ({
-    components: { VInput },
     setup() {
-      return { args };
+      const attrs = computed(() => mapArgsToAttrs(args));
+      return { args, attrs };
     },
-    template: '<div style="width: 200px"><VInput v-bind="args"/></div>',
+    template: '<v-input v-bind="attrs"/>',
   }),
-} satisfies Meta<typeof VInput>;
+} satisfies Meta;
 
 export default meta;
 

@@ -27,7 +27,7 @@ const emits = defineEmits<{
 
 function generateId(name: string): string {
   const number = Math.floor(Math.random() * 1000);
-  return `${name}-${number}}`;
+  return `${name}-${number}`;
 }
 
 const inputId = generateId(props.name);
