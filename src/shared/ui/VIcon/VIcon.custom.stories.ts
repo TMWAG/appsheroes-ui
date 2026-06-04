@@ -1,23 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import VIcon from './VIcon.vue';
-import { iconNames } from './supportedIconMap';
-import { vIconVariants } from './VIcon.story-args.ts';
+import { computed } from 'vue';
+import { mapArgsToAttrs } from '@/shared/ui/helpers/storybook-ce';
+import { vIconVariants } from './VIcon.story-args';
+import { iconNames } from '@/shared/ui/VIcon/supportedIconMap';
 
 const meta = {
-  component: VIcon,
-  title: 'Vue/Icon',
+  title: 'Custom Elements/Icon',
   tags: ['autodocs'],
   argTypes: {
     name: { control: 'select', options: iconNames },
   },
   render: (args) => ({
-    components: { VIcon },
     setup() {
-      return { args };
+      const attrs = computed(() => mapArgsToAttrs(args));
+      return { args, attrs };
     },
-    template: '<VIcon v-bind="args"/>',
+    template: '<v-icon v-bind="attrs"/>'
   }),
-} satisfies Meta<typeof VIcon>;
+} satisfies Meta;
 
 export default meta;
 
