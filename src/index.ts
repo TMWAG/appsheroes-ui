@@ -20,6 +20,8 @@ export type {
   IconNames,
 } from './shared/ui';
 
+export { configure, getIconSpriteUrl } from './shared/lib/icon-config';
+
 export {
   useVLoader,
   useMouseTracker,

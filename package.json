@@ -30,7 +30,7 @@
   "scripts": {
     "build": "npm run build:lib && npm run build:ce",
     "build:lib": "vite build && vue-tsc -p tsconfig.lib.json && cp -r src/shared/styles dist/styles",
-    "build:ce": "vite build -c vite.config.ce.ts",
+    "build:ce": "vite build -c vite.config.ce.ts && mkdir -p dist/web/icons && cp src/shared/ui/VIcon/bootstrap-icons.svg dist/web/icons/",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
     "typecheck:lib": "vue-tsc -p tsconfig.lib.json --noEmit",
