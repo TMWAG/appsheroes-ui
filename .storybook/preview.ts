@@ -4,6 +4,9 @@ import type { App } from 'vue';
 import { defineCustomElement } from 'vue';
 
 import '@/shared/styles/index.scss';
+import spriteUrl from '@/shared/ui/VIcon/bootstrap-icons.svg?url';
+
+window.__APPSHEROES_ICON_SPRITE_URL__ = spriteUrl;
 
 import VButtonCE from '@/shared/ui/VButton/VButton.vue?custom-element';
 import VChipCE from '@/shared/ui/VChip/VChip.vue?custom-element';
