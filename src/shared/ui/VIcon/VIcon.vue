@@ -2,9 +2,8 @@
 import { computed } from 'vue';
 import { supportedIconMap, type IconNames } from './supportedIconMap';
 import { getIconSpriteUrl } from '@/shared/lib/icon-config';
-import defaultSpriteUrl from './bootstrap-icons.svg?url';
 
-const FALLBACK_SPRITE_PATH = 'icons/bootstrap-icons.svg';
+const DEFAULT_SPRITE_URL = 'icons/bootstrap-icons.svg';
 
 const props = defineProps<{
   /** Icon name from bootstrap icons */
@@ -16,10 +15,7 @@ const props = defineProps<{
 }>();
 
 const isDecorative = computed(() => !props.ariaLabel);
-const resolvedDefault = defaultSpriteUrl.startsWith('data:')
-  ? FALLBACK_SPRITE_PATH
-  : defaultSpriteUrl;
-const spriteUrl = getIconSpriteUrl(resolvedDefault);
+const spriteUrl = getIconSpriteUrl(DEFAULT_SPRITE_URL);
 const href = computed(() => `${spriteUrl}#${supportedIconMap[props.name]}`);
 </script>
 

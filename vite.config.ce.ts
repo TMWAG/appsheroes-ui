@@ -23,15 +23,5 @@ export default defineConfig({
     },
     cssCodeSplit: false,
     outDir: 'dist/web',
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.names?.some((n) => n.endsWith('.svg'))) {
-            return 'icons/[name][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
-        },
-      },
-    },
   },
 })
