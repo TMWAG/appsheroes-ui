@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { VIcon } from '../VIcon';
 import { VTooltip } from '../VTooltip';
 
@@ -26,7 +26,20 @@ const emits = defineEmits<{
   reset: [];
 }>();
 
-const inputRef = ref<HTMLInputElement | null>(null);
+const hasValue = ref(!!props.value);
+
+watch(
+  () => props.value,
+  (v) => {
+    hasValue.value = !!v;
+  },
+);
+
+function onInput(e: Event) {
+  const target = e.target as HTMLInputElement;
+  hasValue.value = target.value.length > 0;
+  emits('input', target.value);
+}
 
 function generateId(name: string): string {
   const number = Math.floor(Math.random() * 1000);
@@ -40,7 +53,7 @@ const inputId = generateId(props.name);
   <div class="input" ref="input">
     <div class="input__wrapper">
       <button
-        v-if="resettable && inputRef?.value?.length"
+        v-if="resettable && hasValue"
         class="input__reset_button"
         @click.prevent="emits('reset')"
         type="button"
@@ -49,14 +62,13 @@ const inputId = generateId(props.name);
         <VIcon name="x" class-name="input__reset_icon" />
       </button>
       <input
-        ref="inputRef"
         type="text"
         placeholder=" "
         :name="name"
         :id="inputId"
         :value="value"
         class="input__input"
-        @input="emits('input', ($event.target as HTMLInputElement).value)"
+        @input="onInput"
       />
       <label class="input__label" :for="inputId">
         {{ label }}
