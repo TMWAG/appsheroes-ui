@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { VIcon } from '../VIcon';
 import { VTooltip } from '../VTooltip';
 
@@ -25,6 +26,8 @@ const emits = defineEmits<{
   reset: [];
 }>();
 
+const inputRef = ref<HTMLInputElement | null>(null);
+
 function generateId(name: string): string {
   const number = Math.floor(Math.random() * 1000);
   return `${name}-${number}`;
@@ -37,7 +40,7 @@ const inputId = generateId(props.name);
   <div class="input" ref="input">
     <div class="input__wrapper">
       <button
-        v-if="resettable && value"
+        v-if="resettable && inputRef?.value?.length"
         class="input__reset_button"
         @click.prevent="emits('reset')"
         type="button"
@@ -46,6 +49,7 @@ const inputId = generateId(props.name);
         <VIcon name="x" class-name="input__reset_icon" />
       </button>
       <input
+        ref="inputRef"
         type="text"
         placeholder=" "
         :name="name"

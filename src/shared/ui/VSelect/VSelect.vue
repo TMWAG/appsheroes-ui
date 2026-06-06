@@ -62,6 +62,15 @@ const isOpen = ref<boolean>(false);
 const focusedIndex = ref<number>(-1);
 const searchQuery = ref<string>('');
 
+const currentValue = ref<T | T[] | null>(props.modelValue);
+
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    currentValue.value = newVal;
+  },
+);
+
 const { style: dropdownStyle, updatePosition } = useFloatingPosition({
   triggerRef: triggerEl,
   floatingRef: dropdownRef,
@@ -73,8 +82,8 @@ const { style: dropdownStyle, updatePosition } = useFloatingPosition({
 let resetTimer: ReturnType<typeof setTimeout> | null = null;
 
 const valueArray = computed<T[]>(() => {
-  if (props.modelValue === null || props.modelValue === undefined) return [];
-  return Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue];
+  if (currentValue.value === null || currentValue.value === undefined) return [];
+  return Array.isArray(currentValue.value) ? currentValue.value : [currentValue.value];
 });
 
 const valueSet = computed(() => new Set(valueArray.value));
@@ -181,10 +190,12 @@ function toggleOption(option: SelectOption<T>) {
     const arr = [...valueArray.value];
     const exists = valueSet.value.has(option.value);
     const next = exists ? arr.filter((v) => v !== option.value) : [...arr, option.value];
+    currentValue.value = next;
     emits('update:modelValue', next);
     emits('change', next);
     clearSearch();
   } else {
+    currentValue.value = option.value;
     emits('update:modelValue', option.value);
     emits('change', option.value);
     close();
@@ -199,6 +210,7 @@ function selectFocused() {
 
 function reset() {
   const emptyValue = props.multiple ? [] : null;
+  currentValue.value = emptyValue;
   emits('update:modelValue', emptyValue);
   emits('change', emptyValue);
   emits('reset');
@@ -240,6 +252,7 @@ function onWrapperKeydown(e: KeyboardEvent) {
     } else if (props.multiple && valueArray.value.length && !isOpen.value) {
       e.preventDefault();
       const arr = valueArray.value.slice(0, -1);
+      currentValue.value = arr;
       emits('update:modelValue', arr);
       emits('change', arr);
     }
